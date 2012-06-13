@@ -1,0 +1,15 @@
+target/
+bin/
+.project
+.settings
+.classpath
+.checkstyle
+.metadata
+*~
+*.log
+local.properties
+test-output/
+
+
+
+

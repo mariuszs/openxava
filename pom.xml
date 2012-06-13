@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.pentacomp.openxava</groupId>
+	<artifactId>openxava-project</artifactId>
+	<version>1.0-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<properties>
+		<openxava.version>4.4.1</openxava.version>
+		<liferay.version>6.1.0</liferay.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.openxava</groupId>
+				<artifactId>openxava</artifactId>
+				<version>${openxava.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<modules>
+		<module>common</module>
+		<module>war	</module>
+		<module>portlet</module>
+	</modules>
+
+	<scm>
+		<connection>scm:git:http://192.168.12.33/gerrit/p/openxava.git</connection>
+		<developerConnection>scm:git:ssh://192.168.12.33:8090/openxava.git</developerConnection>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>turbine-repository</id>
+			<url>http://ci.lektykarska.pentacomp.pl/nexus/content/repositories/bgk-sr-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>turbine-repository</id>
+			<url>http://ci.lektykarska.pentacomp.pl/nexus/content/repositories/bgk-sr-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>http://ci.lektykarska.pentacomp.pl/jenkins/job/openxava/</url>
+	</ciManagement>
+
+	<repositories>
+		<repository>
+			<id>penta-repository</id>
+			<url>http://ci.lektykarska.pentacomp.pl/nexus/content/groups/bgk-sr/</url>
+		</repository>
+	</repositories>
+
+</project>

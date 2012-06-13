@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN" "http://directwebremoting.org/schema/dwr20.dtd">
+
+<dwr>
+
+  <allow>
+
+    <create creator="new" javascript="Module">
+      <param name="class" value="org.openxava.web.dwr.Module"/>
+    </create>
+    
+    <create creator="new" javascript="Tab">
+      <param name="class" value="org.openxava.web.dwr.Tab"/>
+    </create>
+    
+    <create creator="new" javascript="View">
+      <param name="class" value="org.openxava.web.dwr.View"/>
+    </create>    
+    
+    <convert converter="bean" match="org.openxava.web.dwr.Result"/>    
+    <convert converter="bean" match="org.openxava.web.dwr.StrokeAction"/>
+        
+  </allow>
+  
+    <signatures>
+  		<![CDATA[
+  			import java.util.Map;
+  			import javax.servlet.http.HttpServletRequest;
+  			import javax.servlet.http.HttpServletResponse;  			
+  			Module.request(
+  				HttpServletRequest request, 
+  				HttpServletResponse response, 
+  				String application, String module, String additionalParameters, 
+  				Map<String, String> values, 
+  				Map<String, String> multipleValues, 
+  				String [] selected,
+  				Boolean firstRequest);
+  		]]>
+	</signatures>  
+
+</dwr>
