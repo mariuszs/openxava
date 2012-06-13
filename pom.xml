@@ -37,11 +37,11 @@
 
 	<distributionManagement>
 		<repository>
-			<id>turbine-repository</id>
+			<id>penta-repository</id>
 			<url>http://ci.lektykarska.pentacomp.pl/nexus/content/repositories/bgk-sr-releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>turbine-repository</id>
+			<id>penta-repository</id>
 			<url>http://ci.lektykarska.pentacomp.pl/nexus/content/repositories/bgk-sr-snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
