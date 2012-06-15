@@ -43,8 +43,16 @@ Calendar._TT["NEXT_YEAR"] = "Nast. rok (przytrzymaj dla menu)";
 Calendar._TT["SEL_DATE"] = "Wybierz datę";
 Calendar._TT["DRAG_TO_MOVE"] = "Przesuń okienko";
 Calendar._TT["PART_TODAY"] = " (dziś)";
-Calendar._TT["MON_FIRST"] = "Pokaż Poniedziałek jako pierwszy";
-Calendar._TT["SUN_FIRST"] = "Pokaż Niedzielę jako pierwszą";
+
+//the following is to inform that "%s" is to be the first day of week
+//%s will be replaced with the day name.
+Calendar._TT["DAY_FIRST"] = "Pokaż %s jako pierwszy";
+
+//This may be locale-dependent.  It specifies the week-end days, as an array
+//of comma-separated numbers.  The numbers are from 0 to 6: 0 means Sunday, 1
+//means Monday, etc.
+Calendar._TT["WEEKEND"] = "0,6";
+
 Calendar._TT["CLOSE"] = "Zamknij";
 Calendar._TT["TODAY"] = "Dziś";
 Calendar._TT["TIME_PART"] = "(Shift-)klik | drag, aby zmienić wartość";
@@ -54,3 +62,4 @@ Calendar._TT["DEF_DATE_FORMAT"] = "%Y.%m.%d";
 Calendar._TT["TT_DATE_FORMAT"] = "%a, %b %e";
 
 Calendar._TT["WK"] = "wk";
+Calendar._TT["TIME"] = "Czas:";
