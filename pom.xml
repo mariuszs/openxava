@@ -11,6 +11,7 @@
 	<properties>
 		<openxava.version>4.4.1</openxava.version>
 		<liferay.version>6.1.0</liferay.version>
+		<hibernate.version>3.6.1.Final</hibernate.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

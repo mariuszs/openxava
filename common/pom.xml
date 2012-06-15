@@ -36,12 +36,12 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-c3p0</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>c3p0</artifactId>
@@ -57,17 +57,17 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-ehcache</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-envers</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>hibernate-tools</artifactId>
@@ -78,7 +78,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-infinispan</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>infinispan-core</artifactId>
@@ -89,7 +89,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-jbosscache</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>jbosscache-core</artifactId>
@@ -100,7 +100,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-oscache</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>oscache</artifactId>
@@ -111,7 +111,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-proxool</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>proxool</artifactId>
@@ -122,7 +122,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-swarmcache</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>swarmcache</artifactId>
@@ -133,7 +133,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-testing</artifactId>
-			<version>3.6.1.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
