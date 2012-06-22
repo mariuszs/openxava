@@ -2,32 +2,77 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.pentacomp.openxava</groupId>
+		<groupId>org.openxava</groupId>
 		<artifactId>openxava-project</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>4.4.1.MVN-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-	<artifactId>openxava-common</artifactId>
-	<packaging>war</packaging>
+
+	<artifactId>openxava</artifactId>
+	<packaging>jar</packaging>
 
 	<dependencies>
-		<!-- <dependency>
+
+		<dependency>
+			<groupId>org.jboss</groupId>
+			<artifactId>jboss-ejb</artifactId>
+			<version>4.0.3</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
-			<version>2.4</version>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.portlet</groupId>
+			<artifactId>portlet-api</artifactId>
+			<version>1.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>
 			<artifactId>jsp-api</artifactId>
-			<version>2.0</version>
+			<version>2.2</version>
 			<scope>provided</scope>
-		</dependency> -->
-		<!-- OpenXava -->
-		<dependency>
-			<groupId>org.openxava</groupId>
-			<artifactId>openxava</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.cssparser</groupId>
+			<artifactId>cssparser</artifactId>
+			<version>0.9.5</version>
+		</dependency>
+
+
+		<!-- <dependency> <groupId>com.liferay.portal</groupId> <artifactId>portal-client</artifactId> 
+			<version>6.1.0</version> <scope>provided</scope> </dependency> -->
+
+		<dependency>
+			<groupId>com.liferay.portal</groupId>
+			<artifactId>portal-kernel</artifactId>
+			<version>OpenXava-4.4.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.liferay.portal</groupId>
+			<artifactId>portal-service</artifactId>
+			<version>OpenXava-4.4.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.htmlunit</groupId>
+			<artifactId>htmlunit</artifactId>
+			<version>2.9</version>
+			<scope>test</scope>
+		</dependency>
+
+
+
+		<!-- <dependency> <groupId>javax.servlet</groupId> <artifactId>servlet-api</artifactId> 
+			<version>2.4</version> <scope>provided</scope> </dependency> <dependency> 
+			<groupId>javax.servlet.jsp</groupId> <artifactId>jsp-api</artifactId> <version>2.0</version> 
+			<scope>provided</scope> </dependency> -->
+		<!-- OpenXava -->
 		<dependency>
 			<groupId>org.openxava</groupId>
 			<artifactId>ox-jdbc-adapters</artifactId>
