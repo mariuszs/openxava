@@ -26,24 +26,25 @@
 	</dependencyManagement>
 
 	<modules>
+		<source>source</source>
 		<module>common</module>
 		<module>war	</module>
 		<module>portlet</module>
 	</modules>
 
 	<scm>
-		<connection>scm:git:http://192.168.12.33/gerrit/p/openxava.git</connection>
-		<developerConnection>scm:git:ssh://192.168.12.33:8090/openxava.git</developerConnection>
+		<connection>scm:git:git://github.com/mariuszs/openxava.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:mariuszs/openxava.git</developerConnection>
 	</scm>
 
 	<distributionManagement>
 		<repository>
-			<id>penta-repository</id>
-			<url>http://ci.lektykarska.pentacomp.pl/nexus/content/repositories/bgk-sr-releases</url>
+			<id>repo</id>
+			<url>https://github.com/mariuszs/maven-repository/raw/master</url>
 		</repository>
 		<snapshotRepository>
-			<id>penta-repository</id>
-			<url>http://ci.lektykarska.pentacomp.pl/nexus/content/repositories/bgk-sr-snapshots</url>
+			<id>snapshot-repo</id>
+			<url>https://github.com/mariuszs/maven-repository/raw/master</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -51,12 +52,5 @@
 		<system>Jenkins</system>
 		<url>http://ci.lektykarska.pentacomp.pl/jenkins/job/openxava/</url>
 	</ciManagement>
-
-	<repositories>
-		<repository>
-			<id>penta-repository</id>
-			<url>http://ci.lektykarska.pentacomp.pl/nexus/content/groups/bgk-sr/</url>
-		</repository>
-	</repositories>
 
 </project>
