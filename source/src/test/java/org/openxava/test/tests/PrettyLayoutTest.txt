@@ -1,0 +1,15 @@
+The tests in this package do not include pretty layout. Therefore,
+when you touch layout logic you have to test visually
+at least the next cases:
+- DeliveryFullInvoice:
+ 		With <reference-view reference="invoice" frame="true"/>
+ 		and  <reference-view reference="invoice" frame="false"/>
+ 		in FullInvoice view of Delivery   
+ 		The problem may be in layout of bottom element (outside invoice reference)
+- Customer: seller with relationWithSeller group
+- InvoiceNestedSections2: On select the section data > details 
+	the section has not to be duplicated (it was a bug) 		
+- Invoice: Inside Liferay, buttons inside portlets
+- A section with only a property (enmarcable and not enmarcable) inside Liferay
+ 		with more portlets below. The frame of the OX porltet mustn't wrap all other portlets.
+- Product5FamilyFromSubfamily: The properties in the group must be in the same line
