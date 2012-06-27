@@ -48,19 +48,21 @@ Using
 ### Project structure
 
     pom.xml
-    src
-       main
-          java
-          resources
-             META-INF
+    src/
+       main/
+          java/
+             ...
+          resources/
+             META-INF/
                 persistance.xml
              application.xml
              hibernate.cfg.xml
              editors.xml
              controllers.xml
              ...
-          webapp
-             WEB-INF
+          webapp/
+             WEB-INF/
                 web.xml
+                ...
              
 
