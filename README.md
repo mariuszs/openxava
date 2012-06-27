@@ -12,7 +12,7 @@ Using
         <modelVersion>4.0.0</modelVersion>
 
         <artifactId>openxava-portlet</artifactId>
-	<packaging>war</packaging>
+        <packaging>war</packaging>
 
         <dependencies>
             <dependency>
@@ -32,7 +32,7 @@ Using
         <modelVersion>4.0.0</modelVersion>
 
         <artifactId>openxava-portlet</artifactId>
-	<packaging>war</packaging>
+        <packaging>war</packaging>
 
         <dependencies>
             <dependency>
@@ -44,3 +44,23 @@ Using
             </dependency>	
         </dependencies>
     </project>
+
+### Project structure
+
+    pom.xml
+    src
+       main
+          java
+          resources
+             META-INF
+                persistance.xml
+             application.xml
+             hibernate.cfg.xml
+             editors.xml
+             controllers.xml
+             ...
+          webapp
+             WEB-INF
+                web.xml
+             
+
