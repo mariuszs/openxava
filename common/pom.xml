@@ -11,10 +11,6 @@
 	<packaging>war</packaging>
 
 	<dependencies>
-		<!-- OpenXava -->
-		<dependency>
-			<groupId>org.openxava</groupId>
-			<artifactId>openxava</artifactId>
-		</dependency>
+		
 	</dependencies>
 </project>
