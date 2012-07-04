@@ -67,6 +67,10 @@
 			<id>penta-repository</id>
 			<url>http://ci.lektykarska.pentacomp.pl/nexus/content/groups/bgk-sr/</url>
 		</repository>
+		<repository>
+			<id>mimacom.org</id>
+			<url>http://repo.mimacom.org/content/repositories/mimacom-public/</url>
+		</repository>
 	</repositories>
 
 </project>
