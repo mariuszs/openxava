@@ -1681,6 +1681,30 @@ public class Tab implements java.io.Serializable {
 		}	
 	}
 	
+	public void initFilterCondition(){
+	    List metaPropertiesNC = getMetaPropertiesNotCalculated();
+        int size = metaPropertiesNC.size();
+        if (size > 0) {
+            filterConditionValues = new String[size];
+            for (int i = 0; i < size; i++) {
+                filterConditionValues[i] = "";
+            }
+        }
+	}
+	
+	public void addConditionValue(String property, Object value) {
+        List metaPropertiesNC = getMetaPropertiesNotCalculated();
+        int size = metaPropertiesNC.size();
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                if (((MetaProperty) metaPropertiesNC.get(i)).getName().equals(property)) {
+                    filterConditionValues[i] = value==null?null:value.toString(); // A little rundimentary, maybe would be better to use a formatter
+                    filtered = true;
+                }
+            }
+        }   
+    }
+	
 	private void setFilteredConditionValues() {
 		if (filtered && filterConditionValues != null) {
 			filtered = false;
