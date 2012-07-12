@@ -1681,35 +1681,24 @@ public class Tab implements java.io.Serializable {
 		}	
 	}
 	
-	public void initFilterCondition(){
-	    conditionComparators = null;
-	    conditionValues = null;
-	    conditionValuesTo = null;
-	    conditionComparatorsToWhere = null;
-	    conditionValuesToWhere = null;
-	    List metaPropertiesNC = getMetaPropertiesNotCalculated();
-	    
+	/** @since 2012-07-12 */
+	public void setConditionValues(Map conditions) {
+        List metaPropertiesNC = getMetaPropertiesNotCalculated();
         int size = metaPropertiesNC.size();
         if (size > 0) {
             filterConditionValues = new String[size];
             for (int i = 0; i < size; i++) {
                 filterConditionValues[i] = "";
-            }
-        }
-	}
-	
-	public void addConditionValue(String property, Object value) {
-        List metaPropertiesNC = getMetaPropertiesNotCalculated();
-        int size = metaPropertiesNC.size();
-        if (size > 0) {
-            for (int i = 0; i < size; i++) {
-                if (((MetaProperty) metaPropertiesNC.get(i)).getName().equals(property)) {
+                if (conditions.containsKey(((MetaProperty) metaPropertiesNC.get(i)).getName())){
+                    Object value = conditions.get(((MetaProperty) metaPropertiesNC.get(i)).getName());
                     filterConditionValues[i] = value==null?null:value.toString(); // A little rundimentary, maybe would be better to use a formatter
                     filtered = true;
                 }
             }
         }   
     }
+	
+	
 	
 	private void setFilteredConditionValues() {
 		if (filtered && filterConditionValues != null) {
@@ -1740,7 +1729,11 @@ public class Tab implements java.io.Serializable {
 					conditionValues[i] = filterConditionValues[i];
 					conditionValuesTo[i] = "";
 					conditionComparators[i] = "eq";
-				}
+				} else {//reszte warunkow czyscimy /** @since 2012-07-12 */
+                    conditionValues[i] = "";
+                    conditionValuesTo[i] = "";
+                    conditionComparators[i] = "eq";
+                }
 			}
 			
 		}
