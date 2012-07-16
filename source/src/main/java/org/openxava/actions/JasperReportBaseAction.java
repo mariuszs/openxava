@@ -19,7 +19,7 @@ import net.sf.jasperreports.engine.*;
  * @author Daniel García Salas  
  */
 
-abstract public class JasperReportBaseAction extends ViewBaseAction implements IForwardAction, IModelAction { 
+abstract public class JasperReportBaseAction extends TabBaseAction implements IForwardAction, IModelAction { 
 	
 	public static String PDF = "pdf";
 	public static String EXCEL = "excel"; 
