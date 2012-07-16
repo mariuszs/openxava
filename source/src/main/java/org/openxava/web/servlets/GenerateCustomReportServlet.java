@@ -83,6 +83,7 @@ public class GenerateCustomReportServlet extends HttpServlet {
 		} 
 		catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
+			ex.printStackTrace();
 			throw new ServletException(XavaResources.getString("report_error"));
 		}		
 	}
