@@ -13,6 +13,8 @@ import org.apache.commons.logging.*;
 import org.openxava.actions.*;
 import org.openxava.util.*;
 
+import com.pentacomp.CustomCsvJasperExporter;
+
 /**
  * To generate custom Jasper Reports from that extends <code>JasperReportBaseAction</code>.
  * 
@@ -65,7 +67,7 @@ public class GenerateCustomReportServlet extends HttpServlet {
 			else if (format.equalsIgnoreCase(JasperReportBaseAction.CSV)) {              
                 response.setContentType("text/csv"); 
                 response.setHeader("Content-Disposition", "attachment; filename=\"report.csv\""); 
-                exporter = new JRCsvExporter() ;// 
+                exporter = new CustomCsvJasperExporter() ; 
                 exporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "CP1250");
                 exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
             }
