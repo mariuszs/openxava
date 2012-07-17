@@ -66,6 +66,8 @@ public class GenerateCustomReportServlet extends HttpServlet {
                 response.setContentType("text/csv"); 
                 response.setHeader("Content-Disposition", "attachment; filename=\"report.csv\""); 
                 exporter = new JRCsvExporter() ;// 
+                exporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "CP1250");
+                exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
             }
 			else if (format.equalsIgnoreCase(JasperReportBaseAction.ODT)) {  				
 				response.setContentType("application/vnd.oasis.opendocument.text");
