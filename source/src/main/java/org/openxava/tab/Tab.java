@@ -1672,7 +1672,7 @@ public class Tab implements java.io.Serializable {
 		if (size > 0) {
 			filterConditionValues = new String[size];
 			for (int i = 0; i < size; i++) {
-				filterConditionValues[i] = "";
+			    filterConditionValues[i] = "";
 				if (((MetaProperty) metaPropertiesNC.get(i)).getName().equals(property)) {
 					filterConditionValues[i] = value==null?null:value.toString(); // A little rundimentary, maybe would be better to use a formatter
 					filtered = true;
@@ -1680,6 +1680,25 @@ public class Tab implements java.io.Serializable {
 			}
 		}	
 	}
+	
+	/** @since 2012-07-12 */
+	public void setConditionValues(Map conditions) {
+        List metaPropertiesNC = getMetaPropertiesNotCalculated();
+        int size = metaPropertiesNC.size();
+        if (size > 0) {
+            filterConditionValues = new String[size];
+            for (int i = 0; i < size; i++) {
+                filterConditionValues[i] = "";
+                if (conditions.containsKey(((MetaProperty) metaPropertiesNC.get(i)).getName())){
+                    Object value = conditions.get(((MetaProperty) metaPropertiesNC.get(i)).getName());
+                    filterConditionValues[i] = value==null?null:value.toString(); // A little rundimentary, maybe would be better to use a formatter
+                    filtered = true;
+                }
+            }
+        }   
+    }
+	
+	
 	
 	private void setFilteredConditionValues() {
 		if (filtered && filterConditionValues != null) {
@@ -1710,7 +1729,11 @@ public class Tab implements java.io.Serializable {
 					conditionValues[i] = filterConditionValues[i];
 					conditionValuesTo[i] = "";
 					conditionComparators[i] = "eq";
-				}
+				} else {//reszte warunkow czyscimy /** @since 2012-07-12 */
+                    conditionValues[i] = "";
+                    conditionValuesTo[i] = "";
+                    conditionComparators[i] = "eq";
+                }
 			}
 			
 		}

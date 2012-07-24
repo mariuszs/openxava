@@ -19,12 +19,14 @@ import net.sf.jasperreports.engine.*;
  * @author Daniel García Salas  
  */
 
-abstract public class JasperReportBaseAction extends ViewBaseAction implements IForwardAction, IModelAction { 
+abstract public class JasperReportBaseAction extends TabBaseAction implements IForwardAction, IModelAction { 
 	
 	public static String PDF = "pdf";
 	public static String EXCEL = "excel"; 
 	public static String RTF = "rtf";
 	public static String ODT = "odt"; 
+    public static String CSV = "csv";
+    public static String TXT = "txt";
 		
 	private String modelName;
 	private String format = PDF;
@@ -67,8 +69,10 @@ abstract public class JasperReportBaseAction extends ViewBaseAction implements I
 		if (!EXCEL.equalsIgnoreCase(format) && 
 			!PDF.equalsIgnoreCase(format) &&
 			!RTF.equalsIgnoreCase(format) &&
+			!TXT.equalsIgnoreCase(format) &&
+			!CSV.equalsIgnoreCase(format) &&
 			!ODT.equalsIgnoreCase(format)) { 
-			throw new XavaException("invalid_report_format", "'excel', 'pdf', 'rtf','odt'");
+			throw new XavaException("invalid_report_format", "'excel', 'pdf', 'rtf', 'odt', 'txt', 'csv'");
 		} 
 		this.format = format;		
 	}

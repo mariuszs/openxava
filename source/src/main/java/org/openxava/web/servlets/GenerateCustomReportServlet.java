@@ -13,6 +13,8 @@ import org.apache.commons.logging.*;
 import org.openxava.actions.*;
 import org.openxava.util.*;
 
+import com.pentacomp.CustomCsvJasperExporter;
+
 /**
  * To generate custom Jasper Reports from that extends <code>JasperReportBaseAction</code>.
  * 
@@ -46,17 +48,32 @@ public class GenerateCustomReportServlet extends HttpServlet {
 			JRExporter exporter;
 			if (format.equals(JasperReportBaseAction.EXCEL)) {
 				response.setContentType("application/vnd.ms-excel");
-				response.setHeader("Content-Disposition", "inline; filename=\"report.xls\"");
+				response.setHeader("Content-Disposition", "attachment; filename=\"report.xls\"");
 				exporter = new JRXlsExporter();
 			} 
 			else if (format.equalsIgnoreCase(JasperReportBaseAction.RTF)) { 				
 				response.setContentType("application/rtf"); 
-				response.setHeader("Content-Disposition", "inline; filename=\"report.rtf\""); 
+				response.setHeader("Content-Disposition", "attachment; filename=\"report.rtf\""); 
 				exporter = new JRRtfExporter() ;//
-			} 			
+			}
+			else if (format.equalsIgnoreCase(JasperReportBaseAction.TXT)) {              
+                response.setContentType("text/plain");                               
+                response.setHeader("Content-Disposition", "attachment; filename=\"report.txt\""); 
+                exporter = new JRTextExporter() ;//
+                exporter.setParameter(JRTextExporterParameter.CHARACTER_WIDTH, 6); 
+                exporter.setParameter(JRTextExporterParameter.CHARACTER_HEIGHT, 10); 
+                
+            }
+			else if (format.equalsIgnoreCase(JasperReportBaseAction.CSV)) {              
+                response.setContentType("text/csv"); 
+                response.setHeader("Content-Disposition", "attachment; filename=\"report.csv\""); 
+                exporter = new CustomCsvJasperExporter() ; 
+                exporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "CP1250");
+                exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+            }
 			else if (format.equalsIgnoreCase(JasperReportBaseAction.ODT)) {  				
 				response.setContentType("application/vnd.oasis.opendocument.text");
-				response.setHeader("Content-Disposition", "inline; filename=\"report.odt\""); 
+				response.setHeader("Content-Disposition", "attachment; filename=\"report.odt\""); 
 				exporter = new JROdtExporter();
 			}
 			else {
@@ -70,6 +87,7 @@ public class GenerateCustomReportServlet extends HttpServlet {
 		} 
 		catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
+			ex.printStackTrace();
 			throw new ServletException(XavaResources.getString("report_error"));
 		}		
 	}
