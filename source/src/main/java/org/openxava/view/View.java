@@ -8,6 +8,7 @@ import javax.ejb.FinderException;
 import javax.ejb.ObjectNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openxava.actions.IOnChangePropertyAction;
@@ -163,11 +164,13 @@ public class View implements java.io.Serializable {
 	private int collectionTotalsCount = -1;
 	private Collection<MetaProperty> recalculatedMetaProperties;
 	private List collectionValues; 
+	private Map<String, Collection<String>> changedActionsByProperty = null; 
+	private Collection propertiesWithChangedActions; 
 	
 	// firstLevel is the root view that receives the request 
 	// usually match with getRoot(), but not always. For example,
 	// you can fill a dialog using a subview from the current view
-	// In that case, inside the dialog this subview will be firstLeve, though
+	// In that case, inside the dialog this subview will be firstLevel, though
 	// it continues being a subview.
 	private boolean firstLevel;
 
@@ -381,7 +384,7 @@ public class View implements java.io.Serializable {
 		 
 	private Map getValues(boolean all, boolean onlyKeyFromSubviews) throws XavaException {		
 		Map hiddenKeyAndVersion = null;  
-		if (values == null) {  
+		if (values == null) {
 			values = new HashMap();  
 		} 
 		else { 
@@ -468,7 +471,7 @@ public class View implements java.io.Serializable {
 				setModelName(modelName);
 				modelChanged = true;
 			}
-		}						
+		}	
 		setValues(values, true);
 		if (modelChanged) refresh(); 
 	}
@@ -978,17 +981,14 @@ public class View implements java.io.Serializable {
 				trySetValueInGroups(name, value);		
 				return true;
 			}
-			if (!getMembersNamesWithoutSections().contains(name)) { 
-				if (setValueInSections(name, value)) {
-					return true;
-				}
-				else {
+			if (!getMembersNamesWithoutSections().contains(name)) {
+				if (!setValueInSections(name, value)){
 					if (!(getMetaModel().getKeyPropertiesNames().contains(name) || getMetaModel().getKeyReferencesNames().contains(name) || getMetaModel().isVersion(name))) {
 						return false;
 					}															
 				}
-			}			
-			if (hasSubview(name)) {					
+			}
+			if (hasSubview(name)) {	
 				View subview = getSubview(name);
 				if (!subview.isRepresentsCollection()) {
 					subview.setValues((Map)value);										
@@ -997,11 +997,11 @@ public class View implements java.io.Serializable {
 					throw new XavaException("no_set_collection_value_error", name);
 				}					
 			}
-			else { 										
+			else { 					
 				if (values == null) values = new HashMap();					
 				value = Strings.removeXSS(value); 
 				values.put(name, value);
-			}				 							 								 
+			}	
 		} 
 		else if (displayAsDescriptionsList()) {
 			if (values == null) values = new HashMap();					
@@ -1039,8 +1039,9 @@ public class View implements java.io.Serializable {
 	private boolean setValueInSections(String name, Object value) throws XavaException {
 		if (!hasSections()) return false;
 		int count = getSections().size();		
-		for (int i = 0; i < count; i++) {			
-			if (getSectionView(i).trySetValue(name, value))	return true;			 				
+		for (int i = 0; i < count; i++) {	
+			if (getSectionView(i).trySetValue(name, value))	return true;
+			
 		}		
 		return false;
 	}
@@ -1128,7 +1129,7 @@ public class View implements java.io.Serializable {
 					
 				}								
 			}		
-		}		
+		}	
 		return result; 
 	}
 	
@@ -1229,7 +1230,7 @@ public class View implements java.io.Serializable {
 	 */
 	public Tab getCollectionTab() throws XavaException {		
 		assertRepresentsCollection("getCollectionTab()");
-		if (collectionTab == null) {			
+		if (collectionTab == null) {
 			collectionTab = new Tab();
 			collectionTab.setCollectionView(this); 
 			collectionTab.setModelName(getModelName());
@@ -1247,7 +1248,8 @@ public class View implements java.io.Serializable {
 				collectionTab.setFilter(filter);
 			}
 			else {
-				collectionTab.setBaseCondition(createBaseConditionForCollectionTab());							
+				collectionTab.setBaseCondition(createBaseConditionForCollectionTab());
+				
 				CollectionInViewFilter filter = new CollectionInViewFilter();
 				filter.setView(getParent());
 				collectionTab.setFilter(filter);
@@ -1670,20 +1672,21 @@ public class View implements java.io.Serializable {
 			membersNamesWithoutSections = new ArrayList();
 			while (it.hasNext()) {
 				MetaMember m = (MetaMember) it.next();
-				if (isMetaProperty(m)) {					
+				if (isMetaProperty(m)) {		
 					membersNamesWithoutSections.add(m.getName());
 				}
-				else if (m instanceof MetaReference) {										
+				else if (m instanceof MetaReference) {				
 					membersNamesWithoutSections.add(m.getName());					
 				}
-				else if (m instanceof MetaCollection) {					
+				else if (m instanceof MetaCollection) {				
 					membersNamesWithoutSections.add(m.getName());
 				}				
-				else if (m instanceof MetaGroup && !isHidden(m.getName())) {  
+				else if (m instanceof MetaGroup && !isHidden(m.getName())) {
 					membersNamesWithoutSections.addAll(getGroupView(((MetaGroup) m).getName()).getMembersNamesWithoutSections());					
 				}
 			}					
 		}
+
 		return membersNamesWithoutSections;
 	}
 
@@ -2135,7 +2138,8 @@ public class View implements java.io.Serializable {
 			oldValues = values==null?null:new HashMap(values);
 			mustRefreshCollection = false;
 			reloadNeeded = false;			
-			changedPropertiesActionsAndReferencesWithNotCompositeEditor = null; 
+			changedPropertiesActionsAndReferencesWithNotCompositeEditor = null;
+			propertiesWithChangedActions = null; 
 			sectionChanged = false; 
 			oldKeyEditable = keyEditable; 
 			oldEditable = editable;
@@ -2228,11 +2232,16 @@ public class View implements java.io.Serializable {
 		return getParent().getQualifiedCollectionName() + getMemberName() + "_"; 
 	}
 	
-	private void fillCollectionInfo(String qualifier) throws XavaException {
-		String tabPrefix = Tab.COLLECTION_PREFIX + getQualifiedCollectionName();
-		getCollectionTab().setSelected(getRequest().getParameterValues(tabPrefix + "selected"));
+	private void fillCollectionInfo(String qualifier) throws XavaException { 
+		String id = null;
+		if (!isCollectionCalculated()) { 
+			id = Tab.COLLECTION_PREFIX + getQualifiedCollectionName() + "selected";
+			getCollectionTab().setSelected(getRequest().getParameterValues(id));
+		}
+		else {
+			id = qualifier + "__SELECTED__";
+		}		
 		// Fill selected
-		String id = qualifier + "__SELECTED__"; 		
 		String [] sel = getRequest().getParameterValues(id);
 		if (sel == null || sel.length == 0) {
 			listSelected = null;
@@ -3597,7 +3606,14 @@ public class View implements java.io.Serializable {
 	} 
 			                                                                                                                                                                                                                                                                                                                                                                                                                   
 	public Collection getActionsNamesForProperty(MetaProperty p, boolean editable) throws XavaException {		
-		return getMetaView().getActionsNamesForProperty(p, editable);
+		if (getParentIfSectionOrGroup().changedActionsByProperty == null) return getMetaView().getActionsNamesForProperty(p, editable);
+		initializeActionsForProperty(p.getName());
+		if (!getChangedActionsByProperty().containsKey(p.getName())) return getMetaView().getActionsNamesForProperty(p, editable);
+		Collection addedActions = getChangedActionsByProperty().get(p.getName()); 
+		if (addedActions.isEmpty()) return getMetaView().getActionsNamesForProperty(p, editable);
+		Collection result = new ArrayList(getMetaView().getActionsNamesForProperty(p, editable));
+		result.addAll(addedActions);
+		return result;
 	}
 	
 	public Collection getActionsNamesForReference(MetaReference ref, boolean editable) throws XavaException {		
@@ -4104,7 +4120,8 @@ public class View implements java.io.Serializable {
 				!equals(en.getValue(), oldValues.get(en.getKey())) || 	
 				isKey && hasKeyEditableChanged() || 
 				hasEditableChanged() ||
-				hasEditableMemberChanged((String) en.getKey()) || 
+				hasEditableMemberChanged((String) en.getKey()) ||
+				propertyHasChangedActions((String) en.getKey()) || 
 				formattedProperties != null && formattedProperties.contains(en.getKey()) ||
 				editorMustBeReloaded((String) en.getKey())) 
 			{									
@@ -4176,7 +4193,7 @@ public class View implements java.io.Serializable {
 		boolean existsCurrent = notEditableMembersNames == null?false:notEditableMembersNames.contains(member);
 		return existsOld != existsCurrent;
 	}
-	
+			
 	private boolean editorMustBeReloaded(String memberName) {		
 		MetaProperty p = null;
 		try {
@@ -4355,8 +4372,53 @@ public class View implements java.io.Serializable {
 			// Only the displayed data matters here
 			getSectionView(getActiveSection()).fillChangedCollections(result);	
 		}						
-	}	
+	}
 	
+	/** 
+	 * Indices of selected rows of collections that has changed their selected rows but not their content. <p>
+	 * 
+	 * This does not have a valid value until the end of the request, and it's intended
+	 * to be used from the AJAX code in order to determine what to refresh.
+	 * 
+	 * @since 4.5
+	 */	
+	public Map<String, int []> getChangedCollectionsSelectedRows() { 		
+		Map result = new HashMap();
+		fillChangedCollectionsSelectedRows(result);
+		return result;
+	}
+	
+	private void fillChangedCollectionsSelectedRows(Map<String, int []> result) {  
+		if (hasSubviews()) {
+			Iterator itSubviews = getSubviews().values().iterator();
+			while (itSubviews.hasNext()) {
+				View subview = (View) itSubviews.next();				
+				if (subview.isRepresentsCollection() && 
+					!subview.mustRefreshCollection() && isShown() &&
+					!isHidden(subview.getMemberName()))  
+				{
+					if (subview.collectionTab != null) {						
+						int [] selected = subview.collectionTab.getSelected();
+						if (!XArrays.haveSameElements(selected, subview.listSelected)) {
+							result.put(getPropertyPrefix() + subview.getMemberName(), selected);				
+						}
+					}
+				}				
+				subview.fillChangedCollectionsSelectedRows(result);				
+			}
+		}
+		if (hasGroups()) {
+			Iterator itSubviews = getGroupsViews().values().iterator();
+			while (itSubviews.hasNext()) {
+				View subview = (View) itSubviews.next();				
+				subview.fillChangedCollectionsSelectedRows(result);
+			}
+		}						
+		if (!sectionChanged && hasSections()) {
+			// Only the displayed data matters here
+			getSectionView(getActiveSection()).fillChangedCollectionsSelectedRows(result);	
+		}						
+	}		
 
 	private boolean isShown() { 
 		if (viewObject == null) return false;
@@ -4704,5 +4766,57 @@ public class View implements java.io.Serializable {
 			return false;
 		}
 	}		
+	
+	/**
+	 * Add an action to the property. <p>
+	 * 
+	 * The action will be show even if the view or the property is not editable.<br> 
+	 * 
+	 * @since 4.5
+	 */
+	public void addActionForProperty(String property, String qualifiedActionName) throws XavaException {
+		initializeActionsForProperty(property);
+		getChangedActionsByProperty().get(property).add(qualifiedActionName);
+		addPropertyWithChangedActions(property); 
+	}
+	
+	/**
+	 * Add an action to the property. <p>
+	 * 
+	 * Only the actions added with addActionForProperty() can be removed.<br> 
+	 * 
+	 * @since 4.5
+	 */
+	public void removeActionForProperty(String property, String qualifiedActionName) throws XavaException {	
+		if(getParentIfSectionOrGroup().changedActionsByProperty != null){
+			if(getChangedActionsByProperty().containsKey(property)){
+				getChangedActionsByProperty().get(property).remove(qualifiedActionName);
+				addPropertyWithChangedActions(property); 
+			}
+		}
+	}
+	
+	private void addPropertyWithChangedActions(String property) { 		
+		if (getParentIfSectionOrGroup().propertiesWithChangedActions == null) getParentIfSectionOrGroup().propertiesWithChangedActions = new HashSet();
+		getParentIfSectionOrGroup().propertiesWithChangedActions.add(property);
+	}
+	
+	public boolean propertyHasChangedActions(String property) { 
+		if (getParentIfSectionOrGroup().propertiesWithChangedActions == null) return false;
+		return getParentIfSectionOrGroup().propertiesWithChangedActions.contains(property);
+	}
+	
+	private void initializeActionsForProperty(String property) throws XavaException {
+		if(getChangedActionsByProperty().get(property) == null){
+			getChangedActionsByProperty().put(property, new ArrayList<String>());			
+		}
+	}
+	
+	private Map<String, Collection<String>> getChangedActionsByProperty() { 
+		if (getParentIfSectionOrGroup().changedActionsByProperty == null) {
+			getParentIfSectionOrGroup().changedActionsByProperty = new HashMap<String, Collection<String>>();
+		}
+		return getParentIfSectionOrGroup().changedActionsByProperty;
+	}
 						
 }

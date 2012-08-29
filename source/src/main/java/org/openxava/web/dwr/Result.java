@@ -11,6 +11,7 @@ public class Result {
 	
 	private Map changedParts;
 	private Map strokeActions;
+	private Map selectedRows; 
 	private String forwardURL;
 	private boolean forwardInNewWindow;
 	private String[] forwardURLs; 
@@ -169,6 +170,14 @@ public class Result {
 
 	public String[] getForwardURLs() {
 		return forwardURLs;
+	}
+
+	public Map getSelectedRows() {
+		return selectedRows;
+	}
+
+	public void setSelectedRows(Map selectedRows) {
+		this.selectedRows = selectedRows;
 	}
 	
 }

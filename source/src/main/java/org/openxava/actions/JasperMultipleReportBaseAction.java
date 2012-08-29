@@ -9,6 +9,7 @@ import javax.servlet.*;
 import org.apache.commons.logging.*;
 import org.openxava.jpa.XPersistence;
 import org.openxava.util.*;
+
 import net.sf.jasperreports.engine.*;
 
 /**
@@ -17,7 +18,57 @@ import net.sf.jasperreports.engine.*;
  * 
  * You only need to overwrite the abstract methods.<br>
  * 
+ * To send parameters to the reports you have 3 options. 
+ * <ol>
+ * <li>If all the repors use the same parameters just overwrite getParameters().</li>
+ * <li>If each report has different parameter overwrite getParameters(int i), or well</li>
+ * <li>overwrite execute() and before calling to super.execute() call to addParameters() method.</li>
+ * </ol>
+ * <h4>Option 1 for parameters</h4>
+ * <code>
+ * 	public Map getParameters() throws Exception  {
+ *		Map parameters = new HashMap();				
+ *		parameters.put("param1", value1);								
+ *		parameters.put("param2", value2);
+ *		return parameters;
+ *	}
+ * </code>
+ * 
+ * <h4>Option 2 for parameters</h4>
+ * <code>
+ * 	protected Map getParameters(int index) throws Exception  {
+ *		Map parameters = new HashMap();
+ *		switch (index) {
+ *			case 0:								
+ *				parameters.put("param1", value1);								
+ *				parameters.put("param2", value2);
+ *				return parameters;
+ *			case 1:								
+ *				parameters.put("param3", value3);								
+ *				parameters.put("param4", value4);
+ *				return parameters;
+ *		}
+ *		return null;
+ *	}
+ * </code>
+ * 
+ * <h4>Option 3 for parameters</h4>
+ * <code>
+ *	public void execute() throws Exception {
+ *		Map parameters1 = new HashMap();
+ *		parameters1.put("param1", value1);								
+ *		parameters1.put("param2", value2);
+ *		addParameters(parameters1);
+ *		Map parameters2 = new HashMap();
+ *		parameters1.put("param3", value3);								
+ *		parameters1.put("param4", value4);
+ *		addParameters(parameters2);		
+ *		super.execute();
+ *	}
+ * </code> 
+ * 
  * @author Oscar Caro
+ * @author Franklin Alier : Added a parameters list to allow separate parameters per report 
  */
 
 abstract public class JasperMultipleReportBaseAction extends ViewBaseAction
@@ -32,6 +83,9 @@ abstract public class JasperMultipleReportBaseAction extends ViewBaseAction
 
 	private String modelName;
 	private String format = PDF;
+	
+	// To Allow parameter sets per report
+	private List<Map> parametersList = new ArrayList<Map>();
 
 	/** 
 	 * Data to print.
@@ -57,7 +111,28 @@ abstract public class JasperMultipleReportBaseAction extends ViewBaseAction
 	/**
 	 * Parameters to send to report.
 	 */
-	abstract protected Map getParameters() throws Exception;
+	protected Map getParameters() throws Exception {
+		return null;
+	}
+
+	/**
+	 * Retrieve parameters for the specified report index.
+	 * <p>
+	 * Maintains backward compatibility by calling getParameters()
+	 * if parameters list is empty or not enough parameter sets defined.
+	 * @author Franklin Alier
+	 * @since 4.5
+	 */
+	protected Map getParameters(int i) throws Exception { 
+		
+		if ( parametersList.size() == 0 || i > parametersList.size()-1 ) {
+			return getParameters();
+		}
+		else
+		{
+			return parametersList.get(i);
+		}
+	}
 
 	/**
 	 * Output report format, it can be 'pdf' or 'excel'.
@@ -103,8 +178,12 @@ abstract public class JasperMultipleReportBaseAction extends ViewBaseAction
 			if (xmlDesign == null)
 				throw new XavaException("design_not_found");
 			JasperReport report = JasperCompileManager.compileReport(xmlDesign);
-			Map parameters = getParameters(); // getParameters() before
+			
+			// Retrieve the parameter set for the report at this index.
+			//
+			Map parameters = getParameters(i); // getParameters() before
 												// getDatasource()
+
 			JRDataSource[] ds = getDataSources();
 			JasperPrint jprint = null;
 			if (ds == null) {
@@ -161,4 +240,48 @@ abstract public class JasperMultipleReportBaseAction extends ViewBaseAction
 		this.modelName = modelName;
 	}
 
+	/**
+	 * Set parameter list.
+	 * <p>
+	 * Allows setting the parameter list outside this code.
+	 * @author Franklin Alier
+	 * @since 4.5
+	 */
+	public void setParametersList(List<Map> parametersList) {
+		this.parametersList = parametersList;
+	}
+
+	/**
+	 * Retrieve the current parameter list.
+	 * @author Franklin Alier
+	 * @since 4.5
+	 */
+	public List<Map> getParametersList() {
+		return parametersList;
+	}
+	
+	/**
+	 * Add a parameter set to the current list.
+	 * <p>
+	 * Appends the parameter set to the parameter list.
+	 * @author Franklin Alier
+	 * @since 4.5
+	 */	
+	public void addParameters(Map parameters) {
+		parametersList.add(parameters);
+	}
+
+	/**
+	 * Add a parameter set at a specified index.
+	 * <p>
+	 * Inserts the parameter set into the parameter list at the specified index.
+	 * @param index - The index to insert into.
+	 * @param parameter - The parameter set to insert.
+	 * @author Franklin Alier
+	 * @since 4.5
+	 */
+	public void addParameters(int index, Map parameters) {
+		parametersList.add(index, parameters);
+	}
+	
 }

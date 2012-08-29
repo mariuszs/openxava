@@ -4,269 +4,133 @@ import java.rmi.*;
 import java.sql.*;
 import java.util.*;
 
-import javax.ejb.*;
-
-
-
 import org.apache.commons.logging.*;
+import org.openxava.component.*;
+import org.openxava.converters.*;
+import org.openxava.mapping.*;
+import org.openxava.model.meta.*;
 import org.openxava.util.*;
 
 /**
  * An <code>ITabProvider</code> that obtain data via JDBC. <p>
  *
- * It is a JavaBean and allows set properties as table name, fields,
- * search condition, etc. <br>
- *
- * Before use this object is advisable call to {@link #invariant}.<br>
- *
  * @author  Javier Paniza
  */
 
-public class JDBCTabProvider implements ITabProvider, java.io.Serializable {
-
+public class JDBCTabProvider extends TabProviderBase {
+	
 	private static Log log = LogFactory.getLog(JDBCTabProvider.class);
-	private static final int DEFAULT_CHUNK_SIZE = 50;	
+	private Collection<TabConverter> converters;
 
-	private String select; // Select ... from ...
-	private String selectSize;
-	private String table;
-	private String[] fields;
-	private String[] conditions;
-	private Object[] key;
-	private IConnectionProvider connectionProvider;
-	private int chunkSize = DEFAULT_CHUNK_SIZE;
-	private int current;  
-	private boolean eof = true;
-	private PreparedStatement ps;
-	
-	
-	public void search(int index, Object key)
-		throws FinderException, RemoteException {
-		try {
-			search(conditions[index], key);
-		}
-		catch (IndexOutOfBoundsException ex) {
-			throw new IndexOutOfBoundsException(
-					XavaResources.getString("tab_search_not_found", new Integer(index)));
-		}
+	protected String translateCondition(String condition) { 
+		return getMetaModel().getMapping().changePropertiesByColumns(condition); 
 	}
 	
-	public void search(String condition, Object key) throws FinderException, RemoteException {		
-		current = 0;
-		eof = false;
-		this.key = toArray(key);					
-		condition = condition == null ? "" : condition.trim(); 
-		if (condition.equals(""))
-			select = generateSelect(); // for all
-		else if (condition.toUpperCase().startsWith("SELECT")) 
-			select = condition;
-		else
-			select = generateSelect() + " WHERE " + condition;					
-		selectSize = createSizeSelect(select);
-	}
-	
-	private String generateSelect() {
-		if (table == null
-			|| table.trim().equals("")
-			|| fields == null
-			|| fields.length == 0) {
-			return null;
-		}
-
-		StringBuffer newSelect = new StringBuffer("SELECT ");
-		int i;
-		for (i = 0; i < fields.length - 1; i++) {
-			newSelect.append(fields[i]);
-			newSelect.append(", ");
-		}
-		newSelect.append(fields[i]); 
-		newSelect.append(" FROM ");
-		newSelect.append(table);
-		return newSelect.toString();
-	}
-	
-	public String[] getFields() {
-		return fields;
-	}
-	
-	/**
-	 * List of codition in SQL format. <p>
-	 * 
-	 * The condition can be:
-	 * <ul>
-	 * <li> A complete SQL SELECT.
-	 * <li> The SELECT sentence from WHERE (not included). In this case
-	 * 			the complete sentece is formed form the values in {@link #getFields() fields} 
-	 * 			and {@link @getTable table}.
-	 * <li> Nothing. In this case a SELECT of all records is assumed.
-	 * </ul>
-	 *
-	 * Although complete SELECTs are used in all cases is necessary to specify
-	 * a correct value for {@link #getFields() fields} and {@link @getTable table}.<br>
-	 * When you use complete SELECTs the table and fields used in SELECT must to
-	 * match with {@link #getFields() fields} and {@link @getTable table}.<br>
-	 */
-	public String[] getConditions() {
-		return conditions;
-	}
-	
-	/** To obtaint JDBC connections.  */
-	public IConnectionProvider getConnectionProvider() {
-		return connectionProvider;
-	}
-	
-	/** Database table name.  */
-	public String getTable() {
-		return table;
-	}
-	
-	/** Size of chunk returned by {@link #nextChunk}. */
-	public int getChunkSize() {
-		return chunkSize;
-	}
-	/**
-	 * Verify invariant. <p>
-	 * <b>Invariant:</b>
-	 * <ul>
-	 * <li> table != null
-	 * <li> fields != null && fields.length > 0
-	 * <li> conditions != null && conditions.length > 0
-	 * <li> connectionProvider != null
-	 * </ul>
-	 *
-	 * @exception IllegalStateException  If invariant is broken
-	 */
-	public void invariant() throws IllegalStateException {
-		if (table == null)
-			throw new IllegalStateException(XavaResources.getString("tabprovider_table_required"));
-		if (fields == null)
-			throw new IllegalStateException(XavaResources.getString("tabprovider_field_required"));
-		if (conditions == null || conditions.length == 0)
-			throw new IllegalStateException(XavaResources.getString("tabprovider_condition_required"));
-		if (connectionProvider == null) {
-			throw new IllegalStateException(XavaResources.getString("tabprovider_connection_provider_required"));
-		}
-	}
-	
-	/**
-	 * Position the <code>ResultSet</code> in the appropiate part. <p>
-	 *
-	 * @param rs  <tt>!= null</tt>
-	 */
-	private void position(ResultSet rs) throws SQLException {
-		//rs.absolute(current); // this only run with TYPE_SCROLL_INSENSITIVE, and this is very slow on executing query in some databases
-		for (int i = 0; i < current; i++) {
-			if (!rs.next())
-				return;
-		}
-	}
-	/** Table fields to include. */
-	public void setFields(String[] fields) {
-		this.fields = fields;
-	}
-	
-	/**
-	 * List of codition in SQL format. <p>
-	 * 
-	 * The condition can be:
-	 * <ul>
-	 * <li> A complete SQL SELECT.
-	 * <li> The SELECT sentence from WHERE (not included). In this case
-	 * 			the complete sentece is formed form the values in {@link #getFields() fields} 
-	 * 			and {@link @getTable table}.
-	 * <li> Nothing. In this case a SELECT of all records is assumed.
-	 * </ul>
-	 *
-	 * Although complete SELECTs are used in all cases is necessary to specify
-	 * a correct value for {@link #getFields() fields} and {@link @getTable table}.<br>
-	 * When you use complete SELECTs the table and fields used in SELECT must to
-	 * match with {@link #getFields() fields} and {@link @getTable table}.<br>
-	 */
-	public void setConditions(String[] conditions) {
-		this.conditions = conditions;
-	}
-	
-	/** To obtaint JDBC connections.  */
-	public void setConnectionProvider(IConnectionProvider connectionProvider) {
-		this.connectionProvider = connectionProvider;
-	}
-	/** Database table name.  */
-	public void setTable(String tabla) {
-		this.table = tabla;
-	}
-	/** Size of chunk returned by {@link #nextChunk}. */
-	public void setChunkSize(int chunkSize) {
-		this.chunkSize = chunkSize;
-	}
-	
-	/**
-	 * Creates a <code>ResultSet</code> with the next block data. <p>
-	 *
-	 * @param  con  <tt>!= null</tt>
-	 */
-	private ResultSet nextBlock(Connection con) throws SQLException {
-		
-		// assert(con)
-		
-		/* Not in this way because TYPE_SCROLL_INTENSIVE has a very poor performance
-		   in some databases
-		  PreparedStatement ps =
-			con.prepareStatement(
-				select,
-				ResultSet.TYPE_SCROLL_INSENSITIVE,
-				ResultSet.CONCUR_READ_ONLY);
-		*/
-		
-		if (keyHasNulls()) return null; // Because some databases (like Informix) have problems setting nulls
-				
-		ps = con.prepareStatement(select); 
-		// Fill key values
-		StringBuffer message =
-			new StringBuffer("[JDBCTabProvider.nextBlock] ");
-		message.append(XavaResources.getString("executing_select", select));		
-		
-		for (int i = 0; i < key.length; i++) {
-			ps.setObject(i + 1, key[i]);
-			message.append(key[i]);
-			if (i < key.length - 1)
-				message.append(", ");
-		}
-		log.debug(message);
-		
-		if ((current + chunkSize) < Integer.MAX_VALUE) { 
-			ps.setMaxRows(current + chunkSize + 1); 
-		}		
-		ResultSet rs = ps.executeQuery();						
-		position(rs);
-
-		return rs;
+	public String toQueryField(String propertyName) {		
+		return getMetaModel().getMapping().getQualifiedColumn(propertyName);
 	}
 
-	private boolean keyHasNulls() {
-		if (key == null) return true;
-		for (int i=0; i < key.length; i++) {
-			if (key[i] == null) return true;
-		}
-		return false;
+	public String getSelectBase() {
+		return getMetaModel().getMapping().changePropertiesByColumns(getSelectWithTableJoinsAndHiddenFields());
 	}
+	
+	private String getSelectWithTableJoinsAndHiddenFields() {
+		String select = getMetaTab().getSelect();
+		int i = select.indexOf("from ${");
+		if (i < 0) return select; // It's baseCondition with the complete custom SELECT 
+		int f = select.indexOf("}", i);
+		StringBuffer tableJoinsAndHiddenFields = new StringBuffer();
+		
+		Iterator itCmpFieldsColumnsInMultipleProperties = getMetaTab().getCmpFieldsColumnsInMultipleProperties()
+				.iterator();
+		while (itCmpFieldsColumnsInMultipleProperties.hasNext()) {
+			tableJoinsAndHiddenFields.append(", ");
+			tableJoinsAndHiddenFields.append(itCmpFieldsColumnsInMultipleProperties.next());
+		}
+		
+		tableJoinsAndHiddenFields.append(" from ");
+		tableJoinsAndHiddenFields.append(getMetaModel().getMapping().getTable());
+		
+		if (hasReferences()) {
+			// the tables
 
-	// Implementa ITabProvider
+			Iterator itReferencesMappings = getEntityReferencesMappings().iterator();			
+			while (itReferencesMappings.hasNext()) {
+				ReferenceMapping referenceMapping = (ReferenceMapping) itReferencesMappings.next();				
+				tableJoinsAndHiddenFields.append(" left join ");						
+				tableJoinsAndHiddenFields.append(referenceMapping.getReferencedTable());
+				// select.append(" as "); // it does not work in Oracle
+				tableJoinsAndHiddenFields.append(" T_");				
+				String reference = referenceMapping.getReference();
+				int idx = reference.lastIndexOf('_'); 
+				if (idx >= 0) {
+					// In the case of reference to entity in aggregate only we will take the last reference name
+					reference = reference.substring(idx + 1);
+				}
+				String nestedReference = (String) getEntityReferencesReferenceNames().get(referenceMapping);  
+				if (!Is.emptyString(nestedReference)) {
+					tableJoinsAndHiddenFields.append(nestedReference);
+					tableJoinsAndHiddenFields.append('_');
+				}
+				tableJoinsAndHiddenFields.append(reference);
+				// where of join
+				tableJoinsAndHiddenFields.append(" on ");
+				Iterator itDetails = referenceMapping.getDetails().iterator();
+				while (itDetails.hasNext()) {
+					ReferenceMappingDetail detail = (ReferenceMappingDetail) itDetails.next();
+					String modelThatContainsReference = detail.getContainer().getContainer().getModelName();
+					if (modelThatContainsReference.equals(getMetaModel().getName())) {
+						tableJoinsAndHiddenFields.append(detail.getQualifiedColumn());
+					}
+					else {
+						tableJoinsAndHiddenFields.append("T_");												
+						tableJoinsAndHiddenFields.append(nestedReference); 
+						tableJoinsAndHiddenFields.append(".");
+						tableJoinsAndHiddenFields.append(detail.getColumn());												
+					}
+					tableJoinsAndHiddenFields.append(" = ");
+					tableJoinsAndHiddenFields.append("T_");
+					if (!Is.emptyString(nestedReference)) {
+						tableJoinsAndHiddenFields.append(nestedReference);
+						tableJoinsAndHiddenFields.append('_');
+					}
+					tableJoinsAndHiddenFields.append(reference); 
+					tableJoinsAndHiddenFields.append(".");
+					tableJoinsAndHiddenFields.append(detail.getReferencedTableColumn());					
+					
+					if (itDetails.hasNext()) {
+						tableJoinsAndHiddenFields.append(" and ");
+					}
+				}
+			}
+		}
+		
+		resetEntityReferencesMappings();
+		
+		StringBuffer result = new StringBuffer(select);
+		result.replace(i, f + 2, tableJoinsAndHiddenFields.toString());
+		return result.toString();
+	}
+	
+
 	public DataChunk nextChunk() throws RemoteException {		
-		if (select == null || eof) { // search not called yet
-			return new DataChunk(new Vector(), true, current); // Empty
+		if (getSelect() == null || isEOF()) { // search not called yet
+			return new DataChunk(Collections.EMPTY_LIST, true, getCurrent()); // Empty
 		}
 		ResultSet resultSet = null;
 		Connection con = null;
+		PreparedStatement ps = null;
 		try {
-			con = connectionProvider.getConnection();
-			resultSet = nextBlock(con);
+			con = getConnectionProvider().getConnection();
+			ps = createPreparedStatement(con);
+			resultSet = nextBlock(ps);
 			List data = new ArrayList();
 			int f = 0;
-			int nc = fields.length;
+			int nc = resultSet.getMetaData().getColumnCount();
 			while (resultSet != null && resultSet.next()) {
-				if (++f > chunkSize) {
-					current += chunkSize;
-					return new DataChunk(data, false, current);
+				if (++f > getChunkSize()) {
+					setCurrent(getCurrent() + getChunkSize());
+					return new DataChunk(data, false, getCurrent());
 				}
 				Object[] row = new Object[nc];
 				for (int i = 0; i < nc; i++) {					
@@ -275,12 +139,12 @@ public class JDBCTabProvider implements ITabProvider, java.io.Serializable {
 				data.add(row);
 			}
 			// No more
-			eof = true;
-			return new DataChunk(data, true, current);
+			setEOF(true);
+			return new DataChunk(data, true, getCurrent());
 		}
 		catch (Exception ex) {
-			log.error(XavaResources.getString("select_error", select), ex);
-			throw new RemoteException(XavaResources.getString("select_error", select));
+			log.error(XavaResources.getString("select_error", getSelect()), ex);
+			throw new RemoteException(XavaResources.getString("select_error", getSelect()));
 		}
 		finally {
 			try {
@@ -299,45 +163,74 @@ public class JDBCTabProvider implements ITabProvider, java.io.Serializable {
 			}
 		}
 	}
-	
+		
 	/**
-	 * Return an array from the sent object.
-	 * Si obj == null return Object[0]
+	 * Creates a <code>ResultSet</code> with the next block data. <p>
 	 */
-	private Object[] toArray(Object obj) {
-		if (obj == null)
-			return new Object[0];
-		if (obj instanceof Object[]) {
-			return (Object[]) obj;
+	private ResultSet nextBlock(PreparedStatement ps) throws SQLException {
+		if (ps == null) return null;
+
+		// Fill key values
+		StringBuffer message =
+			new StringBuffer("[JDBCTabProvider.nextBlock] ");
+		message.append(XavaResources.getString("executing_select", getSelect()));		
+		
+		Object [] key = getKey();
+		for (int i = 0; i < key.length; i++) {
+			ps.setObject(i + 1, key[i]);
+			message.append(key[i]);
+			if (i < key.length - 1)
+				message.append(", ");
 		}
-		else {
-			Object[] rs = { obj };
-			return rs;
-		}
-	}
-	public int getCurrent() {
-		return current;
+		log.debug(message);
+		
+		if ((getCurrent() + getChunkSize()) < Integer.MAX_VALUE) { 
+			ps.setMaxRows(getCurrent() + getChunkSize() + 1); 
+		}		
+		ResultSet rs = ps.executeQuery();						
+		position(rs);
+
+		return rs;
 	}
 
-	public void setCurrent(int i) {
-		current = i;
-	}
-	public int getResultSize() throws RemoteException { 
-		return executeNumberSelect(this.selectSize, "tab_result_size_error").intValue();
+	private PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+		/* Not in this way because TYPE_SCROLL_INTENSIVE has a very poor performance
+		   in some databases
+		  PreparedStatement ps =
+			con.prepareStatement(
+				select,
+				ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);
+		*/
+		
+		if (keyHasNulls()) return null; // Because some databases (like Informix) have problems setting nulls
+				
+		return con.prepareStatement(getSelect());
 	}
 	
-	public Number getSum(String column) throws RemoteException { 
-		return executeNumberSelect(createSumSelect(column), "column_sum_error"); 		
+	/**
+	 * Position the <code>ResultSet</code> in the appropiate part. <p>
+	 *
+	 * @param rs  <tt>!= null</tt>
+	 */
+	private void position(ResultSet rs) throws SQLException { 
+		//rs.absolute(current); // this only run with TYPE_SCROLL_INSENSITIVE, and this is very slow on executing query in some databases
+		for (int i = 0; i < getCurrent(); i++) {
+			if (!rs.next())
+				return;
+		}
 	}
-	
-	private Number executeNumberSelect(String select, String errorId) throws RemoteException {
+
+
+	protected Number executeNumberSelect(String select, String errorId) {
 		if (select == null || keyHasNulls()) return 0;						
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 		try {
-			con = connectionProvider.getConnection();
-			ps = con.prepareStatement(select);			
+			con = getConnectionProvider().getConnection();
+			ps = con.prepareStatement(select);
+			Object [] key = getKey();
 			for (int i = 0; i < key.length; i++) {
 				ps.setObject(i + 1, key[i]);				
 			}			
@@ -347,7 +240,7 @@ public class JDBCTabProvider implements ITabProvider, java.io.Serializable {
 		}
 		catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
-			throw new RemoteException(XavaResources.getString(errorId));
+			throw new XavaException(errorId);
 		}
 		finally {
 			try {
@@ -373,33 +266,77 @@ public class JDBCTabProvider implements ITabProvider, java.io.Serializable {
 		}						
 	}
 	
-	private String createSizeSelect(String select) {
-		if (select == null) return null;		
-		String selectUpperCase = Strings.changeSeparatorsBySpaces(select.toUpperCase());
-		int iniFrom = selectUpperCase.indexOf(" FROM ");
-		int end = selectUpperCase.indexOf("ORDER BY ");
-		StringBuffer sb = new StringBuffer("SELECT COUNT(*) ");
-		if (end < 0) sb.append(select.substring(iniFrom));
-		else sb.append(select.substring(iniFrom, end - 1));
-		return sb.toString();
+	private IConnectionProvider getConnectionProvider() {
+		return DataSourceConnectionProvider.getByComponent(getMetaModel().getMetaComponent().getName()); 
 	}
 	
-	private String createSumSelect(String column) { 
-		if (select == null) return null;		
-		String selectUpperCase = Strings.changeSeparatorsBySpaces(select.toUpperCase());
-		int iniFrom = selectUpperCase.indexOf(" FROM ");
-		int end = selectUpperCase.indexOf("ORDER BY ");
-		StringBuffer sb = new StringBuffer("SELECT SUM(");
-		sb.append(column); 
-		sb.append(") ");
-		if (end < 0) sb.append(select.substring(iniFrom));
-		else sb.append(select.substring(iniFrom, end - 1));
-		return sb.toString();
+	public Collection<TabConverter> getConverters() throws XavaException {
+		if (converters == null) {
+			converters = new ArrayList();			
+			int i=0;
+			String table = getMetaModel().getMapping().getTableToQualifyColumn(); 
+			for (String propertyName: getMetaTab().getPropertiesNamesWithKeyAndHidden()) {
+				try {
+					MetaProperty property = getMetaModel().getMetaProperty(propertyName);
+					PropertyMapping propertyMapping = property.getMapping();
+					if (propertyMapping != null) {
+						IConverter converter = propertyMapping.getConverter();
+						if (converter != null) {
+							converters.add(new TabConverter(propertyName, i,  converter));
+						}
+						else {							
+							IMultipleConverter multipleConverter =  propertyMapping.getMultipleConverter();
+							if (multipleConverter != null) {							
+								converters.add(new TabConverter(propertyName, i, multipleConverter, propertyMapping.getCmpFields(), getFields(), table));
+							}
+							else {
+								// This is the case of a key without converter of type int or long
+								// It's for suporting int and long as key and NUMERIC in database
+								// without to declare an explicit converter
+								if (property.isKey()) {
+									if (property.getType().equals(int.class) || property.getType().equals(Integer.class)) {
+										converters.add(new TabConverter(propertyName, i,  IntegerNumberConverter.getInstance()));
+									}
+									else if (property.getType().equals(long.class) || property.getType().equals(Long.class)) {
+										converters.add(new TabConverter(propertyName, i,  LongNumberConverter.getInstance()));
+									}
+								}
+							}	
+						}
+					}
+				}
+				catch (ElementNotFoundException ex) {
+					// Thus we exclude the property out of mapping
+				}
+				i++;
+			}
+		}
+		return converters;
 	}
 	
-	public void reset() throws RemoteException {
-		current = 0;
-		eof = false;
+	private String[] getFields() throws XavaException {
+		Collection c = new ArrayList();
+		// First the key
+		Iterator itKeyNames = getMetaModel().getAllKeyPropertiesNames().iterator();
+		while (itKeyNames.hasNext()) {
+			c.add(getMetaModel().getMapping().getQualifiedColumn((String) itKeyNames.next()));
+		}
+				
+		// Then the others
+		c.addAll(getMetaTab().getTableColumns());
+		c.addAll(getMetaTab().getHiddenTableColumns());
+				
+		String[] result = new String[c.size()];
+		c.toArray(result);		
+		return result;
 	}
 
+	public boolean usesConverters() {
+		return true;
+	}
+
+	protected String translateProperty(String property) {
+		return getMetaModel().getMapping().getQualifiedColumn(property);
+	}
+	
 }

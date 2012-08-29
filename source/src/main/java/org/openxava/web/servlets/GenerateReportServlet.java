@@ -85,7 +85,7 @@ public class GenerateReportServlet extends HttpServlet {
 		}
 
 		public Object getValueAt(int row, int column) {
-			Object r = original.getValueAt(row, column);		
+			Object r = original.getValueAt(row, column);
 
 			if (r instanceof Boolean) {
 				if (((Boolean) r).booleanValue()) return XavaResources.getString(locale, "yes");
@@ -98,16 +98,16 @@ public class GenerateReportServlet extends HttpServlet {
 				}
 			}
 			
-			if (r instanceof Time) {
-				return DateFormat.getTimeInstance(DateFormat.SHORT, locale).format(r);
-			}
-			
-			if (r instanceof Timestamp){
-				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-				return dateFormat.format( r );
-			}
-			
-			if (r instanceof java.util.Date) {
+			if (r instanceof java.util.Date) {				
+				MetaProperty p = getMetaProperty(column); // In order to use the type declared by the developer 
+					// and not the one returned by JDBC or the JPA engine				
+				if (java.sql.Time.class.isAssignableFrom(p.getType())) {
+					return DateFormat.getTimeInstance(DateFormat.SHORT, locale).format(r);
+				}
+				if (java.sql.Timestamp.class.isAssignableFrom(p.getType())) {
+					DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+					return dateFormat.format( r );
+				}
 				return DateFormat.getDateInstance(DateFormat.SHORT, locale).format(r);
 			}
 
@@ -145,6 +145,9 @@ public class GenerateReportServlet extends HttpServlet {
 			int [] selectedRows = (int []) request.getSession().getAttribute("xava_selectedRowsReportTab"); 
 			request.getSession().removeAttribute("xava_selectedRowsReportTab");
 			setDefaultSchema(request);
+			String user = (String) request.getSession().getAttribute("xava_user");
+			request.getSession().removeAttribute("xava_user");
+			Users.setCurrent(user);
 			String uri = request.getRequestURI();				
 			if (uri.endsWith(".pdf")) {
 				InputStream is;

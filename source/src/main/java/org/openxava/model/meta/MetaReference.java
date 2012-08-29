@@ -57,37 +57,6 @@ public class MetaReference extends MetaMember implements Cloneable {
 		return metaCollection==null?false:metaCollection.orderHasQualifiedProperties();
 	}
 	
-	public String getSQLOrderFromReferencedModel() throws XavaException { 
-		String orden = getOrderFromReferencedModel();		
-		if (orden == null) return null;		
-		return getMetaModel().getMapping().changePropertiesByColumns(orden);
-	}
-	
-	public String getEJBQLOrderFromReferencedModel() throws XavaException { 
-		String order = orderHasQualifiedProperties()?null:getOrderFromReferencedModel(); 		
-		if (order == null) return getEJBQLOrderByPrimaryKeyFromReferencedModel();
-		return "ORDER BY " + getMetaModel().getMapping().changePropertiesByCMPAttributes(order);
-	}
-	
-	private String getEJBQLOrderByPrimaryKeyFromReferencedModel() throws XavaException {
-		// reference keys are not included because some problems with jbossql
-		Collection cKeys = getMetaModel().getMetaPropertiesKey();
-		StringBuffer order = new StringBuffer();
-		for (Iterator it = cKeys.iterator(); it.hasNext();) {
-			MetaProperty p = (MetaProperty) it.next();
-			String type = p.getCMPTypeName();
-			// orders with properties of long type does not work in WebSphere 5.1.x
-			// at momment only exclude them
-			if ("long".equals(type) || "java.lang.Long".equals(type)) continue;
-			if (order.length() == 0) order.append("${"); 
-			else order.append(", ${");
-			order.append(p.getName());
-			order.append('}');			
-		}
-		if (order.length() == 0) return "";
-		return "ORDER BY " + getMetaModel().getMapping().changePropertiesByCMPAttributes(order.toString());				
-	}
-					
 	public MetaModel getMetaModelReferenced() throws XavaException {
 		if (metaModelReferenced == null) {
 			ElementName modelName = new ElementName(getReferencedModelName());			

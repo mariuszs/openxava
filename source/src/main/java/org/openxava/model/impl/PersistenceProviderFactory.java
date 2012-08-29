@@ -1,12 +1,10 @@
 package org.openxava.model.impl;
 
-import java.rmi.*;
-
 import org.apache.commons.logging.*;
 import org.openxava.util.*;
 
 /**
- * For obtaining a instance of the persistence provider configured in the sytem. <p>
+ * For obtaining a instance of the persistence provider configured in the system. <p>
  * 
  * @author Javier Paniza
  */

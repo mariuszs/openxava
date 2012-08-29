@@ -78,11 +78,6 @@ public class MetaFinder implements Serializable {
 		this.name = name;
 	}
 	
-	public String getSQLCondition() throws XavaException {		
-		if (Is.emptyString(this.condition)) return "1=1";
-		return getMetaModel().getMapping().changePropertiesByColumns(this.condition);
-	}
-	
 	public boolean isSupportedForEJB2() throws XavaException {
 		return !hasSome3LevelProperty(getCondition()) && 
 			!hasSome3LevelProperty(getOrder());
@@ -111,7 +106,7 @@ public class MetaFinder implements Serializable {
 		}
 		return false;
 	}
-
+	
 	public String getEJBQLCondition() throws XavaException {
 		StringBuffer sb = new StringBuffer("SELECT OBJECT(o) FROM ");
 		sb.append(getMetaModel().getName());
@@ -212,11 +207,6 @@ public class MetaFinder implements Serializable {
 		return order;
 	}
 	
-	public String getSQLOrder() throws XavaException {
-		if (Is.emptyString(this.order)) return "";
-		return getMetaModel().getMapping().changePropertiesByColumns(this.order);
-	}
-
 	public void setOrder(String order) {
 		this.order = order;
 	}
