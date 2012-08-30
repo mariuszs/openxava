@@ -159,8 +159,8 @@
   action CDATA #IMPLIED
 >
 
-<!ELEMENT on-selected-element-action EMPTY>
-<!ATTLIST on-selected-element-action
+<!ELEMENT on-select-element-action EMPTY>
+<!ATTLIST on-select-element-action
   action CDATA #IMPLIED
 >
 

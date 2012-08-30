@@ -21,9 +21,9 @@ Calendar._TT["INFO"] = "O kalendarzu";
 
 Calendar._TT["ABOUT"] =
 "DHTML Date/Time Selector\n" +
-"(c) dynarch.com 2002-2005 / Autor: Mihai Bazon\n" + // don't translate this this ;-)
-"Aby pobrać najnowszą wersję, odwiedź: http://www.dynarch.com/projects/calendar/\n" +
-"Dostępny na licencji GNU LGPL. Zobacz szczegóły na http://gnu.org/licenses/lgpl.html." +
+"(c) dynarch.com 2002-2005 / Author: Mihai Bazon\n" + // don't translate this this ;-)
+"For latest version visit: http://www.dynarch.com/projects/calendar/\n" +
+"Distributed under GNU LGPL.  See http://gnu.org/licenses/lgpl.html for details." +
 "\n\n" +
 "Wybór daty:\n" +
 "- aby wybrać rok użyj przycisków \xab, \xbb\n" +
@@ -43,23 +43,14 @@ Calendar._TT["NEXT_YEAR"] = "Nast. rok (przytrzymaj dla menu)";
 Calendar._TT["SEL_DATE"] = "Wybierz datę";
 Calendar._TT["DRAG_TO_MOVE"] = "Przesuń okienko";
 Calendar._TT["PART_TODAY"] = " (dziś)";
-
-//the following is to inform that "%s" is to be the first day of week
-//%s will be replaced with the day name.
-Calendar._TT["DAY_FIRST"] = "Pokaż %s jako pierwszy";
-
-//This may be locale-dependent.  It specifies the week-end days, as an array
-//of comma-separated numbers.  The numbers are from 0 to 6: 0 means Sunday, 1
-//means Monday, etc.
-Calendar._TT["WEEKEND"] = "0,6";
-
+Calendar._TT["MON_FIRST"] = "Pokaż Poniedziałek jako pierwszy";
+Calendar._TT["SUN_FIRST"] = "Pokaż Niedzielę jako pierwszą";
 Calendar._TT["CLOSE"] = "Zamknij";
 Calendar._TT["TODAY"] = "Dziś";
 Calendar._TT["TIME_PART"] = "(Shift-)klik | drag, aby zmienić wartość";
 
 // date formats
-Calendar._TT["DEF_DATE_FORMAT"] = "%Y-%m-%d";
+Calendar._TT["DEF_DATE_FORMAT"] = "%Y.%m.%d";
 Calendar._TT["TT_DATE_FORMAT"] = "%a, %b %e";
 
-Calendar._TT["WK"] = "ty";
-Calendar._TT["TIME"] = "Czas:";
+Calendar._TT["WK"] = "wk";

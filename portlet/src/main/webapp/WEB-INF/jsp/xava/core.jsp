@@ -8,7 +8,7 @@
 <%
 org.openxava.controller.ModuleManager manager = (org.openxava.controller.ModuleManager) context.get(request, "manager");
 org.openxava.view.View view = (org.openxava.view.View) context.get(request, "xava_view");
-boolean messagesOnTop = !"false".equalsIgnoreCase(request.getParameter("messagesOnTop"));
+boolean messagesOnTop = org.openxava.util.XavaPreferences.getInstance().isMessagesOnTop(); 
 boolean buttonBar = !"false".equalsIgnoreCase(request.getParameter("buttonBar")); 
 String buttonsAlign = buttonBar?"":"text-align: right;";
 %>

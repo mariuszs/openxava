@@ -450,3 +450,33 @@ input {
 #back {
 	-webkit-transform: rotateY(180deg);
 }
+
+/* ---------- Styling for Default Layout Painter ---------- */
+
+.ox-layout-label-left-spacer {
+	width: 8px;
+}
+
+.ox-layout-label-right-spacer {
+	width: 4px;
+}
+
+.ox-layout-label-cell {
+	text-align:right;
+}
+
+.ox-layout-label {
+	
+}
+
+.ox-layout-row-spacer {
+	height: 4px;
+}
+
+.ox-layout-data-cell {
+	white-space:nowrap;
+}
+
+.ox-layout-data {
+	white-space:nowrap;
+}

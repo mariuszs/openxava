@@ -5,13 +5,16 @@
 
 <%@page import="org.openxava.view.View"%><jsp:useBean id="context" class="org.openxava.controller.ModuleContext" scope="session"/>
 <jsp:useBean id="style" class="org.openxava.web.style.Style" scope="request"/>
+<jsp:useBean id="layoutPainterManager" class="org.openxava.web.layout.LayoutPainterManager" scope="session"/>
 
 <%
 String viewObject = request.getParameter("viewObject");
 viewObject = (viewObject == null || viewObject.equals(""))?"xava_view":viewObject;
 org.openxava.view.View view = (org.openxava.view.View) context.get(request, viewObject);
 java.util.Collection sections = view.getSections();
-int activeSection = view.getActiveSection(); 
+int activeSection = view.getActiveSection();
+if (!layoutPainterManager.renderSection(view, pageContext)) {
+
 %>
 
 <table width='100%' cellspacing="0" border="0" cellpadding="0">
@@ -68,3 +71,6 @@ int activeSection = view.getActiveSection();
 	</td></tr>	
 </table>
 <br>
+<%
+} // END IF Not painter is in use
+%>
