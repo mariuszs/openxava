@@ -281,15 +281,6 @@ public class MetaAction extends MetaElement implements Cloneable {
 	public String getConfirmMessage(ServletRequest request, String argv){
 		String row = argv.substring(argv.indexOf("row=") + 4);
 		if (row.indexOf(",") >= 0 ) row = row.substring(0, row.indexOf(","));
-		// because row index start in 0
-		try{
-			int a = Integer.valueOf(row);
-			a++;
-			row = String.valueOf(a);	
-		}
-		catch(NumberFormatException ex){
-		}
-		// 
 		return getConfirmMessage(getLocale(request), row);
 	}
 	

@@ -27,7 +27,7 @@ public class GenerateReportAction extends TabBaseAction implements IForwardActio
 		if (!Is.emptyString(XPersistence.getDefaultSchema())) {
 			getRequest().getSession().setAttribute("xava_jpaDefaultSchemaTab", XPersistence.getDefaultSchema());
 		}
-		getRequest().getSession().setAttribute("xava_user", Users.getCurrent());
+		
 	}
 	
 	private String getHibernateDefaultSchema() {  

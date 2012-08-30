@@ -1,5 +1,6 @@
 package org.openxava.model.meta;
 
+import java.lang.reflect.*;
 import java.util.*;
 
 

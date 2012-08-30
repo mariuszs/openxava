@@ -1,18 +1,11 @@
 package org.openxava.web.style;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openxava.util.PropertiesReader;
-import org.openxava.util.XavaPreferences;
-import org.openxava.util.XavaResources;
+import org.apache.commons.logging.*;
+import org.openxava.util.*;
 
 /**
  * This class and its subclasses is used from JSP code to give
@@ -36,7 +29,6 @@ public class Style {
 	private static Log log = LogFactory.getLog(Style.class);
 	private static Style instance = null;
 	private static Style portalInstance = null;
-	@SuppressWarnings("rawtypes")
 	private static Collection styleClasses; 
 	private static Map<String, Style> stylesByBrowser = new HashMap<String, Style>(); 
 	private Collection<String> additionalCssFiles; 
@@ -119,7 +111,6 @@ public class Style {
 		return "Mode";
 	}
 	
-	@SuppressWarnings("rawtypes")
 	private static Collection getStyleClasses() throws Exception {
 		if (styleClasses == null) {
 			PropertiesReader reader = new PropertiesReader(Style.class, "styles.properties");
@@ -158,7 +149,6 @@ public class Style {
 		return Arrays.asList( 
 			"/xava/editors/calendar/skins/aqua/theme.css", 
 			"/xava/style/yahoo-treeview/treeview.css",
-			"/xava/style/custom.css", 
 			getJQueryCss()
 		);
 	}
@@ -1087,64 +1077,5 @@ public class Style {
 		return "ox-filter-cell";
 	}
 	
-	/**
-	 * @since 4.5
-	 */
-	public String getLayoutLabelLeftSpacer() {
-		return "ox-layout-label-left-spacer";
-	}
 	
-	/**
-	 * @since 4.5
-	 */
-	public String getLayoutLabelRightSpacer() {
-		return "ox-layout-label-right-spacer";
-	}
-
-	/**
-	 * @since 4.5
-	 */
-	public String getLayoutLabelRightSpacerStyle() {
-		return "width:4px;";
-	}
-	
-	/**
-	 * The label cell contains the left spacer, label and right spacer.
-	 * @since 4.5
-	 */
-	public String getLayoutLabelCell() {
-		return "ox-layout-label-cell";
-	}
-	
-	/**
-	 * Since the label cell contains the left spacer, label and right spacer.
-	 * this is the class for styling just the label.
-	 * @since 4.5
-	 */
-	public String getLayoutLabel() {
-		return "ox-layout-label;";
-	}
-	
-	/**
-	 * The data cell contains the data and might contain left spacer.
-	 * 
-	 */
-	public String getLayoutDataCell() {
-		return "ox-layout-data-cell";
-	}
-	
-	/**
-	 * The data cell contains the data and might contain left spacer.
-	 * 
-	 */
-	public String getLayoutData() {
-		return "ox-layout-data";
-	}
-
-	/**
-	 * @since 4.5
-	 */
-	public String getLayoutRowSpacer() {
-		return "ox-layout-row-spacer";
-	}
 }

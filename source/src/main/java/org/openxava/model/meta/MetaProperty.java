@@ -881,7 +881,7 @@ public class MetaProperty extends MetaMember implements Cloneable {
 			}
 			
 			if (java.util.Date.class.isAssignableFrom(type)) {
-				return emptyString?null:DateFormat.getDateInstance(DateFormat.SHORT, locale).parse(value);
+				return emptyString?null:DateFormat.getDateInstance(DateFormat.MEDIUM, locale).parse(value);//change to MEDIUM to work with Polish
 			}
 			
 			if (Long.class.isAssignableFrom(type) || long.class.isAssignableFrom(type)) {

@@ -7,7 +7,6 @@ package org.openxava.util;
  * is executing.
  * 
  * @author Javier Paniza
- * @author Yerik Alarcón
  */
 
 public class UserInfo implements java.io.Serializable {
@@ -16,12 +15,6 @@ public class UserInfo implements java.io.Serializable {
 	private String givenName;
 	private String familyName;
 	private String email;
-	private String jobTitle;
-	private String middleName;
-	private String nickName;
-	private int birthDateYear;
-	private int birthDateMonth;
-	private int birthDateDay;
 	
 	public String getId() {
 		return id;
@@ -47,60 +40,5 @@ public class UserInfo implements java.io.Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
-	// New geters and seters to attributes proposed for OpenXava 4.5
-	public String getJobTitle() {
-		return jobTitle==null?"":jobTitle;
-	}
-	public void setJobTitle(String jobTitle) {
-		this.jobTitle = jobTitle;
-	}
-	public String getMiddleName() {
-		return middleName==null?"":middleName;
-	}
-	public void setMiddleName(String middleName) {
-		this.middleName = middleName;
-	}
-	public String getNickName() {
-		return nickName==null?"":nickName;
-	}
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
-	}
-	public int getBirthDateYear() {
-		return birthDateYear;
-	}
-	public void setBirthDateYear(int birthDateYear) {
-		this.birthDateYear = birthDateYear;
-	}
-	public void setBirthDateYear(Object birthDateYear) {
-		this.birthDateYear = toNumber(birthDateYear);
-	}
 	
-	public int getBirthDateMonth() {
-		return birthDateMonth;
-	}
-	public void setBirthDateMonth(int birthDateMonth) {
-		this.birthDateMonth = birthDateMonth;
-	}
-	public void setBirthDateMonth(Object birthDateMonth) {
-		this.birthDateMonth = toNumber(birthDateMonth);
-	}
-	
-	public int getBirthDateDay() {
-		return birthDateDay;
-	}
-	public void setBirthDateDay(int birthDateDay) {
-		this.birthDateDay = birthDateDay;
-	}
-	public void setBirthDateDay(Object birthDateDay) {
-		this.birthDateDay = toNumber(birthDateDay);
-	}	
-	
-	private int toNumber(Object value) {
-		if (value instanceof Number) return ((Number) value).intValue();
-		if (value == null) return 0;
-		return Integer.parseInt(value.toString());
-	}
-
 }

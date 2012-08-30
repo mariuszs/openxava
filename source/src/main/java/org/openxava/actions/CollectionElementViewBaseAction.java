@@ -24,10 +24,6 @@ abstract public class CollectionElementViewBaseAction extends ViewBaseAction {
 		if (viewObject != null && !dialogOpened) return super.getView();		
 		return getCollectionElementView().getRoot();		
 	}
-	
-	protected boolean mustRefreshCollection() { 
-		return true;
-	}
 		
 	protected void showDialog(View viewToShowInDialog) throws Exception {
 		super.showDialog(viewToShowInDialog);
@@ -46,7 +42,7 @@ abstract public class CollectionElementViewBaseAction extends ViewBaseAction {
 			else {
 				collectionElementView = (View) getContext().get(getRequest(), viewObject);
 			}
-			if (mustRefreshCollection()) collectionElementView.refreshCollections(); 			
+			collectionElementView.refreshCollections(); 
 		}
 		return collectionElementView;
 	}

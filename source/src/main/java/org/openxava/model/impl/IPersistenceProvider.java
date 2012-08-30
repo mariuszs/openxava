@@ -6,7 +6,6 @@ import java.util.*;
 import javax.ejb.*;
 
 import org.openxava.model.meta.*;
-import org.openxava.tab.impl.*;
 import org.openxava.util.*;
 import org.openxava.validators.*;
 
@@ -20,7 +19,7 @@ import org.openxava.validators.*;
  * not mandatory. You can throw PersistenceException, JDOException, HibernateException, 
  * EJBException or whatever RuntimeException your want.<br>  
  * 
- * @author Mï¿½ Carmen Gimeno Alabau
+ * @author Mª Carmen Gimeno Alabau
  */
 public interface IPersistenceProvider {
 	
@@ -147,10 +146,5 @@ public interface IPersistenceProvider {
 	 * This method may be empty, because in some technologies has no sense.<br>
 	 */
 	void refreshIfManaged(Object object);
-	
-	/**
-	 * Provides tabular data. <p>
-	 */
-	ITabProvider createTabProvider();
 	
 }

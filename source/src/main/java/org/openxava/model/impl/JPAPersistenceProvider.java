@@ -9,7 +9,6 @@ import javax.persistence.*;
 import org.apache.commons.logging.*;
 import org.openxava.jpa.*;
 import org.openxava.model.meta.*;
-import org.openxava.tab.impl.*;
 import org.openxava.util.*;
 
 /**
@@ -100,10 +99,6 @@ public class JPAPersistenceProvider extends POJOPersistenceProviderBase {
 		catch (IllegalArgumentException ex) {
 			return false; // Surely it's not annotated with @Entity
 		}		
-	}
-
-	public ITabProvider createTabProvider() {
-		return new JPATabProvider();				
 	}
 
 }

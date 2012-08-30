@@ -11,11 +11,10 @@ import org.hibernate.*;
 import org.openxava.hibernate.*;
 import org.openxava.jpa.*;
 import org.openxava.model.meta.*;
-import org.openxava.tab.impl.*;
 import org.openxava.util.*;
 
 /**
- * @author Mï¿½ Carmen Gimeno Alabau
+ * @author Mª Carmen Gimeno Alabau
  */
 public class HibernatePersistenceProvider extends POJOPersistenceProviderBase {
 	
@@ -90,10 +89,6 @@ public class HibernatePersistenceProvider extends POJOPersistenceProviderBase {
 			catch (UnresolvableObjectException ex) { 				
 			}			
 		}
-	}
-
-	public ITabProvider createTabProvider() {
-		return new JDBCTabProvider();
 	}
 
 }

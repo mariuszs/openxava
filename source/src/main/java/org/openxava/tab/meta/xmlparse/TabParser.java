@@ -37,9 +37,36 @@ public class TabParser extends XmlElementsNames {
 		e.setBaseCondition(ParserUtil.getString(el, xbase_condition[lang]));		
 		e.setDefaultOrder(ParserUtil.getString(el, xdefault_order[lang]));
 		fillProperties(el, e, lang);
+		fillConsults(el, e, lang);
 		return e;
 	}
+	
+	private static MetaConsult createConsult(Node n, int lang) throws XavaException {
+		Element el = (Element) n;
+		MetaConsult a = new MetaConsult();		
+		a.setName(el.getAttribute(xname[lang]));
+		a.setLabel(el.getAttribute(xlabel[lang]));
+		a.setCondition(ParserUtil.getString(el, xcondition[lang]));
+		a.setMetaFilter(createFilter(el, lang));
+		fillParameters(el, a, lang);		
+		return a;
+	}
 		
+	private static MetaParameter createParameter(Node n, int lang) throws XavaException {
+		Element el = (Element) n;
+		MetaParameter p = new MetaParameter();
+		p.setLabel(el.getAttribute(xlabel[lang]));
+		p.setPropertyName(el.getAttribute(xproperty[lang]));
+		p.setLike(Boolean.valueOf(el.getAttribute(xlike[lang])).booleanValue());
+		p.setRange(Boolean.valueOf(el.getAttribute(xrange[lang])).booleanValue());
+		p.setLabelId(el.getAttribute(xlabel_id[lang]));
+		if (p.isLike() && p.isRange()) {
+			throw new XavaException("like_range_incompatibles");
+		}
+		p.setMetaFilter(createFilter(el, lang));
+		return p;
+	}
+	
 	private static MetaFilter createFilter(Element el, int lang) throws XavaException {
 		NodeList l = el.getChildNodes();				
 		int c = l.getLength();
@@ -51,7 +78,25 @@ public class TabParser extends XmlElementsNames {
 		}
 		return null;		
 	}
-		
+	
+	private static void fillConsults(Element el, MetaTab container, int lang)
+		throws XavaException {
+		NodeList l = el.getElementsByTagName(xconsult[lang]);
+		int c = l.getLength();
+		for (int i = 0; i < c; i++) {
+			container.addMetaConsult(createConsult(l.item(i), lang));
+		}
+	}
+	
+	private static void fillParameters(Element el, MetaConsult container, int lang)
+		throws XavaException {
+		NodeList l = el.getElementsByTagName(xparameter[lang]);
+		int c = l.getLength();
+		for (int i = 0; i < c; i++) {
+			container.addMetaParameter(createParameter(l.item(i), lang));
+		}
+	}
+	
 	private static void fillProperties(Element el, MetaTab container, int lang)
 		throws XavaException {
 		NodeList l = el.getChildNodes();

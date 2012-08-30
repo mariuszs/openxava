@@ -21,9 +21,10 @@ import org.apache.commons.logging.LogFactory;
 import org.openxava.component.MetaComponent;
 import org.openxava.filters.FilterException;
 import org.openxava.filters.IFilter;
+import org.openxava.mapping.ModelMapping;
 import org.openxava.model.meta.MetaModel;
 import org.openxava.tab.impl.EntityTabFactory;
-import org.openxava.tab.impl.EntityTab;
+import org.openxava.tab.impl.IEntityTab;
 import org.openxava.tab.meta.MetaTab;
 import org.openxava.util.Is;
 import org.openxava.util.KeyAndDescription;
@@ -156,7 +157,7 @@ public class DescriptionsCalculator implements ICalculator {
 	}
 			
 	/**
-	 * It uses cachï¿½ depend on current parameter values. <p>
+	 * It uses caché depend on current parameter values. <p>
 	 * 
 	 * @return Collection of <tt>KeyAndDescription</tt>. Not null.
 	 */
@@ -261,14 +262,14 @@ public class DescriptionsCalculator implements ICalculator {
 	
 
 	private TableModel executeQuery() throws Exception {
-		EntityTab tab = EntityTabFactory.createAllData(getMetaTab());		
+		IEntityTab tab = EntityTabFactory.createAllData(getMetaTab());		
 		String condition = "";
 		if (hasCondition()) {
-			condition = getCondition(); 
+			condition = getConditionSQL(getMapping());
 		}
 		String order = "";		
 		if (hasOrder()) {
-			order = " ORDER BY " + getOrder(); 
+			order = " ORDER BY " + getOrderSQL(getMapping());
 		}
 		Object [] key = null;
 		if (hasParameters()) {
@@ -291,6 +292,15 @@ public class DescriptionsCalculator implements ICalculator {
 		return !Is.emptyString(order);
 	}
 	
+	
+	private String getConditionSQL(ModelMapping mapping) throws XavaException {
+		return mapping.changePropertiesByColumns(getCondition());
+	}
+	
+	private String getOrderSQL(ModelMapping mapping) throws XavaException {
+		return mapping.changePropertiesByColumns(getOrder());
+	}	
+
 	public String getModel() {
 		return model;
 	}
@@ -367,6 +377,10 @@ public class DescriptionsCalculator implements ICalculator {
 		return !Is.emptyString(aggregateName);
 	}
 	
+	private ModelMapping getMapping() throws XavaException {
+		return getMetaModel().getMapping();
+	}
+
 	public boolean isOrderByKey() {		
 		return orderByKey;
 	}

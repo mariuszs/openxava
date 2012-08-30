@@ -760,14 +760,4 @@ public class Strings {
 			replace("ú", "u").replace("Ú", "U");
 	}
 	
-	/**
-	 * Determines if the string is a valid model name.
-	 * 
-	 * @since 4.5
-	 */
-	public static boolean isModelName(String string) {
-		return Character.isUpperCase(string.charAt(0));
-	}
-
-	
 }

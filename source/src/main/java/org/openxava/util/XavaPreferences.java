@@ -471,20 +471,5 @@ public class XavaPreferences {
 				"summationInList", "true").trim());
 	}
 	
-	/** @since 4.5 */
-	public boolean isMessagesOnTop() { 
-		return "true".equalsIgnoreCase(getProperties().getProperty(
-				"messagesOnTop", "true").trim());
-	}
-
-	/** @since 4.5 */
-	public String getLayoutParser() {
-		return getProperties().getProperty("layout.parser", "org.openxava.web.layout.DefaultLayoutParser"); 
-	}
-
-	/** @since 4.5 */
-	public String getLayoutPainter() {
-		return getProperties().getProperty("layout.painter", null);
-	}
-
+		
 }

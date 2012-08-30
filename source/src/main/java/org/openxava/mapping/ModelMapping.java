@@ -334,7 +334,7 @@ abstract public class ModelMapping implements java.io.Serializable {
 				if (getMetaModel().getMetaProperty(modelProperty).isKey()) {
 					reference = reference.substring(0, reference.lastIndexOf('.'));
 				}				
-				reference = reference.replaceAll("\\.", "_"); 
+				reference = reference.substring(reference.lastIndexOf('.') + 1);
 			}
 			return "T_" + reference + tableColumn.substring(tableColumn.lastIndexOf('.'));
 		}
@@ -481,11 +481,11 @@ abstract public class ModelMapping implements java.io.Serializable {
 	 * <pre>
 	 * select G4GENBD.GENTGER.TGRCOD, G4GENBD.GENTGER.TGRDEN from G4GENBD.GENTGER
 	 * </pre>
-	 */	
+	 */
 	public String changePropertiesByColumns(String source)
 		throws XavaException {		
 		return changePropertiesByColumns(source, true);
-	}	
+	}
 	
 	/**
 	 * Change the properties inside ${ } by the database columns without table
@@ -501,12 +501,12 @@ abstract public class ModelMapping implements java.io.Serializable {
 	 * select TGRCOD, TGRDEN
 	 * from G4GENBD.GENTGER
 	 * </pre>
-	 */	
+	 */
 	public String changePropertiesByNotQualifiedColumns(String source)
 		throws XavaException {
 		return changePropertiesByColumns(source, false);
-	}	
-	
+	}
+		
 	private String changePropertiesByColumns(String source, boolean qualified)
 		throws XavaException {
 		StringBuffer r = new StringBuffer(source);		
@@ -519,23 +519,32 @@ abstract public class ModelMapping implements java.io.Serializable {
 			String property = r.substring(i + 2, f);
 			String column = "0"; // thus it remained if it is calculated
 			if (!getMetaModel().isCalculated(property)) {
-				column = Strings.isModelName(property)?
+				column = isModel(property)?
 					getTable(property):
-						qualified?getQualifiedColumn(property):getColumn(property);
+					qualified?getQualifiedColumn(property):getColumn(property);				
 			}			
 			r.replace(i, f + 1, column);
 			i = r.toString().indexOf("${");
 		}
 		return r.toString();
 	}
-		
+	
 	/**
-	 * @since 4.1
+	 * @since v4_1
 	 */
 	private String getTable(String name){
 		return MetaComponent.get(name).getEntityMapping().getTable();
 	}
 	
+	/**
+	 * If 'name' starts with an upper case it is a Model else it is a property
+	 * @since v4_1
+	 */
+	public static boolean isModel(String name){
+		String firstLetter = name.substring(0, 1);
+		firstLetter = firstLetter.replaceAll("[A-ZÑ]", "");
+		return Is.empty(firstLetter);
+	}
 	
 	public String changePropertiesByCMPAttributes(String source)
 		throws XavaException {

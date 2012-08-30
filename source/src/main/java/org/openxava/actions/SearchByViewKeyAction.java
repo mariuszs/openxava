@@ -34,11 +34,11 @@ public class SearchByViewKeyAction extends ViewBaseAction {
 	private static final long serialVersionUID = 1L;
 	private static Log log = LogFactory.getLog(SearchByViewKeyAction.class);
 
-	public void execute() throws Exception {	
+	public void execute() throws Exception {				
 		try {									
 			Map keys = getKeyValuesFromView();			
 			Map values = null;
-			if (Maps.isEmpty(keys)) {
+			if (Maps.isEmptyOrZero(keys)) { 
 				try {					
 					values = MapFacade.getValuesByAnyProperty(getModelName(), getValuesForSearchByAnyProperty(), getMemberNames());					
 				}
