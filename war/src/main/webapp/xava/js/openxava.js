@@ -121,7 +121,8 @@ openxava.refreshPage = function(result) {
 		if (result.focusPropertyId != null) { 
 			openxava.getElementById(result.application, result.module, "xava_focus_property_id").value = result.focusPropertyId;
 			openxava.setFocus(result.application, result.module);		
-		}		
+		}	
+		openxava.selectRows(result.application, result.module, result.selectedRows); 
 		openxava.initUI(result.application, result.module, result.currentRow); 	
 	}		
 	document.getElementById('xava_processing_layer').style.display='none';
@@ -158,6 +159,23 @@ openxava.initUI = function(application, module, currentRow) {
 
 openxava.initStrokeActions = function(application, module) { 
 	Module.getStrokeActions(application, module, openxava.setStrokeActions);
+}
+
+openxava.selectRows = function(application, module, selectedRows) { 
+	if (selectedRows == null) return;	
+	for (collection in selectedRows) {		
+		$("#" + openxava.decorateId(application, module, collection))
+			.find("._XAVA_SELECTED_ROW_")
+				.removeClass("_XAVA_SELECTED_ROW_ " + openxava.selectedRowClass)
+				.find('[type="checkbox"]').attr("checked", false);		 		
+		for (i in selectedRows[collection]) {
+			var row = selectedRows[collection][i];
+			var id = "xava_collectionTab_" + collection + "_" + row;
+			$("#" + openxava.decorateId(application, module, "xava_collectionTab_" + collection + "_" + row))
+				.addClass("_XAVA_SELECTED_ROW_")
+				.find('[type="checkbox"]').attr("checked", true);									
+		}		
+	}		
 }
 
 openxava.setStrokeActions = function(strokeActions) { 

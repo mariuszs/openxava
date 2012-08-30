@@ -15,6 +15,7 @@
 <jsp:useBean id="errors" class="org.openxava.util.Messages" scope="request"/>
 <jsp:useBean id="context" class="org.openxava.controller.ModuleContext" scope="session"/>
 <jsp:useBean id="style" class="org.openxava.web.style.Style" scope="request"/>
+<jsp:useBean id="layoutPainterManager" class="org.openxava.web.layout.LayoutPainterManager" scope="session"/>
 
 <%!
 private final static String LAST_TABLE_NOT_CLOSED = "xava.layout.detail.lastTableNotClose";
@@ -40,9 +41,11 @@ view.setPropertyPrefix(propertyPrefix);
 boolean onlySections = view.hasSections() && view.getMetaMembers().isEmpty(); 
 %>
 
-<% 
-if (!onlySections) {	// IF Not Only Sections
-	if (view.isFrame()) {	// IF Is Frame 
+<%
+if (!layoutPainterManager.renderView(view, pageContext)) {
+	// Only performed if no layout painter is in effect.
+	if (!onlySections) {	// IF Not Only Sections
+		if (view.isFrame()) {	// IF Is Frame 
 %>
 <table <%=style.getFrameWidth()%>>
 	<tr>
@@ -418,5 +421,6 @@ if (view.hasSections()) { // IF Has Sections
 		 			</td>
 <% 
 	} // END IF Not Only Sections and Subview and Not Frame
+  } // END IF using non-layout renderer
 }
 %>

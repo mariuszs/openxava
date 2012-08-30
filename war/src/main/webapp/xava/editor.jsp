@@ -62,15 +62,16 @@ if (first && !view.isAlignedByColumns()) label = org.openxava.util.Strings.chang
 <span id="<xava:id name='<%="editor_" + view.getPropertyPrefix() + p.getName()%>'/>"> 
 <xava:editor property="<%=p.getName()%>" editable="<%=editable%>" throwPropertyChanged="<%=throwPropertyChanged%>"/>
 </span>
-<% if (view.propertyHasActions(p)) { %>
+
 <span id="<xava:id name='<%="property_actions_" + view.getPropertyPrefix() + p.getName()%>'/>">
+<% if (view.propertyHasActions(p)) { %>
 <jsp:include page="propertyActions.jsp">
 	<jsp:param name="propertyName" value="<%=p.getName()%>"/>
 	<jsp:param name="lastSearchKey" value="<%=lastSearchKey%>"/>
 	<jsp:param name="editable" value="<%=editable%>"/>
 </jsp:include>
-</span>
 <% } %>
+</span>
 
 <% if (!hasFrame) { %>
 <%=postEditor%>
