@@ -104,17 +104,22 @@
 
 <%
 	}
+
+	if (style.getCssFile() != null) {
 %>
-	<%
-		for (java.util.Iterator it = style.getAdditionalCssFiles()
-				.iterator(); it.hasNext();) {
-			String cssFile = (String) it.next();
-	%> 
-	<link rel="stylesheet" type="text/css" media="all" href="<%=contextPath%><%=cssFile%>?ox=<%=version%>"/>
-	<%
-		}
-	%> 	
 	<link href="<%=contextPath%>/xava/style/<%=style.getCssFile()%>?ox=<%=version%>" rel="stylesheet" type="text/css">
+<%
+	}
+
+	for (java.util.Iterator it = style.getAdditionalCssFiles()
+			.iterator(); it.hasNext();) {
+		String cssFile = (String) it.next();
+%> 
+	<link rel="stylesheet" type="text/css" media="all" href="<%=contextPath%><%=cssFile%>?ox=<%=version%>"/>
+<%
+	}
+%> 	
+	
 	<script type='text/javascript' src='<%=contextPath%>/xava/js/dwr-engine.js?ox=<%=version%>'></script>
 	<script type='text/javascript' src='<%=contextPath%>/dwr/util.js?ox=<%=version%>'></script>
 	<script type='text/javascript' src='<%=contextPath%>/dwr/interface/Module.js?ox=<%=version%>'></script>

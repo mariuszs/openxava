@@ -67,7 +67,9 @@ if(!Is.empty(key)){
 			<tbody id = "<%=tableId%>_body" >
 			<%
 			int count = 0;
-			for (String index: indexList.split(",")) {
+			String [] indexes = indexList.split(","); 
+			for (int i=0; i<indexes.length; i++) { 
+				String index = indexes[i]; 
 				actionWithArgs = "row=" + index  + actionArgv;
 				String indexId = prefixIdRow + index;
 				String nodeId = xavaId + index;
