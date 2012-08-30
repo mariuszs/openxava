@@ -60,6 +60,17 @@ here that you want to override.
 		<action name="generateExcel" mode="list"			class="org.openxava.actions.GenerateReportAction"			image="excel.gif"			keystroke="Control Alt X">			<set property="type" value="csv"/>			</action>
 							</controller>
 	
+	<controller name="TypicalNotResetOnSave">
+		<extends controller="Typical"/>
+		<action name="save" mode="detail"
+			class="org.openxava.actions.SaveAction"
+			image="save.gif"
+			by-default="if-possible"
+			keystroke="F3">			
+			<set property="resetAfter" value="false"/>
+		</action>				
+	</controller>	
+				
 	<controller name="DetailList">
 		<action name="initList" on-init="true"
 			class="org.openxava.actions.InitListAction"
