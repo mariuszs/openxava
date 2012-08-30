@@ -42,6 +42,7 @@ import org.openxava.web.style.*;
  *
  * @author  Javier Paniza
  * @author  Guy de Pourtales
+ * @author  Yerik Alarcón
  */
 
 public class XavaPortlet extends GenericPortlet {
@@ -114,6 +115,13 @@ public class XavaPortlet extends GenericPortlet {
 			user.setGivenName((String) userInfo.get("user.name.given"));
 			user.setFamilyName((String) userInfo.get("user.name.family"));
 			user.setEmail(email);
+			user.setJobTitle((String) userInfo.get("user.jobtitle"));
+			user.setMiddleName((String) userInfo.get("user.name.middle"));
+			user.setNickName((String) userInfo.get("user.name.nickName"));
+			user.setBirthDateYear(userInfo.get("user.bdate.ymd.year"));
+			user.setBirthDateMonth(userInfo.get("user.bdate.ymd.month"));
+			user.setBirthDateDay(userInfo.get("user.bdate.ymd.day"));
+			
 			request.getPortletSession().setAttribute("xava.portal.userinfo", user, PortletSession.APPLICATION_SCOPE);
 		}
 				
@@ -228,7 +236,7 @@ public class XavaPortlet extends GenericPortlet {
 				else if (portal.indexOf("jetspeed") >= 0) styleClass = preferences.getJetSpeed2StyleClass();
 				else style = Style.getInstance();
 				
-				if (style == null) style = (Style) XObjects.execute(Class.forName(styleClass), "getInstance");
+				if (style == null) style = (Style) XObjects.execute(Class.forName(styleClass), "getInstance"); 
 				
 				style.setInsidePortal(true); 				
 			}			

@@ -9,7 +9,7 @@ import javax.ejb.*;
  *
  * Allows to obtain a object from a row, refresh and to know the result size.<br>
  *  
- * Util for use in {@link IEntityTab}.<br>
+ * Util for use in {@link EntityTab}.<br>
  *
  * @author  Javier Paniza
  */

@@ -123,34 +123,11 @@ public class MetaCollection extends MetaMember implements IPropertyValidator {
 	public void setCondition(String string) {
 		condition = string;
 	}
-		
-	public String getSQLCondition() throws XavaException {
-		if (Is.emptyString(getCondition())) return ""; 
-		String condicion = changePropertiesThisByArguments(getCondition(), SQL); 
-		return getMetaReference().getMetaModelReferenced().getMapping().changePropertiesByColumns(condicion);
-	}
-	
+
 	public String getSQLConditionWithoutChangePropertiesByColumns() throws XavaException {
 		if (Is.emptyString(getCondition())) return ""; 
 		return changePropertiesThisByArguments(getCondition(), SQL);
-	}
-	
-	public String getEJBQLCondition() throws XavaException {
-		MetaModel metaModel = getMetaReference().getMetaModelReferenced(); 
-		StringBuffer sb = new StringBuffer("SELECT OBJECT(o) FROM ");
-		sb.append(metaModel.getName());
-		sb.append(" o");
-		if (!Is.emptyString(this.condition)) {
-			sb.append(" WHERE ");			
-			String condition = changePropertiesThisByArguments(getCondition(), EJB2QL); 			
-			sb.append(metaModel.getMapping().changePropertiesByCMPAttributes(condition));
-		}
-		if (!Is.emptyString(this.order)) { 		
-			sb.append(" ORDER BY ");
-			sb.append(getMetaReference().getMetaModelReferenced().getMapping().changePropertiesByCMPAttributes(this.order));
-		}
-		return sb.toString();
-	}
+	}	
 	
 	public String getHQLCondition() throws XavaException {
 		return getPOJOCondition(SQL);
@@ -212,11 +189,11 @@ public class MetaCollection extends MetaMember implements IPropertyValidator {
 		}		
 		return false;
 	}
-	
+		
 	public String getSQLOrder() throws XavaException {		
 		if (Is.emptyString(getOrder())) return "";
 		return getMetaReference().getMetaModelReferenced().getMapping().changePropertiesByNotQualifiedColumns(getOrder());
-	}
+	}	
 	
 	public boolean hasCondition() {
 		return !Is.emptyString(getCondition());	

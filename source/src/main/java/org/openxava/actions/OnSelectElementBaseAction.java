@@ -18,6 +18,10 @@ abstract public class OnSelectElementBaseAction extends CollectionBaseAction {
 	private boolean selected;
 	
 	abstract public void execute() throws Exception;
+	
+	protected boolean mustRefreshCollection() { 
+		return false;
+	}
 
 	/**
 	 * Row number of the selected or unselected element.

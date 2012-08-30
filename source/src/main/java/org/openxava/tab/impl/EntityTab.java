@@ -6,20 +6,18 @@ import java.util.*;
 import javax.ejb.*;
 import javax.rmi.*;
 
-
-
 import org.apache.commons.logging.*;
 import org.openxava.component.*;
-import org.openxava.converters.*;
 import org.openxava.ejbx.*;
 import org.openxava.mapping.*;
+import org.openxava.model.impl.*;
 import org.openxava.model.meta.*;
 import org.openxava.tab.meta.*;
 import org.openxava.util.*;
 
 
 /**
- * Local Tab ({@link IEntityTabImpl}) implementation configured from an OpenXava component. <p> 
+ * Provides a TableModel for reading tabular data of an entity. <p> 
  * 
  * This tab is valid for all components, you only need to indicate
  * the model name on create. <br>
@@ -38,29 +36,22 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 	private String selectBase;
 	private String componentName;
 	private String tabName;
-
-	private JDBCTabProvider tabProvider;
+	private ITabProvider tabProvider; 
 	private TableModelBean table;
 	private MetaTab metaTab;
 	private String modelName;
 	private transient MetaModel metaModel = null;
 	private transient ModelMapping mapping = null;
 	private int[] indexesPK = null;	
-	private List propertiesNames;
 	private Map keyIndexes = null;
-
-	private List tabCalculators;
-	private Collection tabConverters;
-	
+	private List tabCalculators;	
 	private boolean	knowIfHasPropertiesWithValidValues = false;
 	private boolean _hasPropertiesWithValidValues;
 	
-	
-	
-	public void search(int index, Object key)
-		throws FinderException, RemoteException {
-		tabProvider.search(index, key);
+	public boolean usesConverters() {
+		return tabProvider.usesConverters();
 	}
+	
 	
 	public void search(String condition, Object key) throws FinderException, RemoteException {
 		try {				
@@ -69,7 +60,7 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 				if (!condition.toUpperCase().trim().startsWith("ORDER BY")) {
 					if (select.toString().toUpperCase().indexOf("WHERE") < 0) select.append(" WHERE "); 
 					else select.append(" AND "); 								
-				}				
+				}
 				select.append(condition); 
 			}																		
 			tabProvider.search(select.toString(), key);
@@ -80,9 +71,10 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 		}		
 	}
 	
-	private String getSelectBase() throws XavaException {
+	private String getSelectBase() {
 		if (selectBase == null) {
-			selectBase = insertKeyFields(metaTab.getSelectSQL());
+			String select = tabProvider.getSelectBase();
+			selectBase = insertKeyFields(select); 
 		}
 		return selectBase;
 	}
@@ -95,7 +87,7 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 			Map result = new HashMap();
 			for (int i = 0; i < key.length; i++) {
 				int iProperty = getIndexesPK()[i];
-				String name = (String) getPropertiesNames().get(iProperty);
+				String name = getPropertiesNames().get(iProperty);
 				result.put(name, key[i]);
 			}			
 			return result;
@@ -184,7 +176,7 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 			if (Is.emptyString(componentName)) {
 				throw new InitException("tab_component_required");
 			}
-			tabProvider = new JDBCTabProvider();
+			tabProvider = PersistenceProviderFactory.getInstance().createTabProvider();			
 			table = new TableModelBean();
 			table.setTranslateHeading(false);
 			this.mapping = null;
@@ -197,13 +189,10 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 			table.setHeading(getHeading());
 			table.setColumnsClasses(getColumnsClasses());
 			table.setPropertiesNames(getPropertiesNames()); 
-			tabProvider.setFields(getFields());
-			tabProvider.setConditions(getConditions());			
-			tabProvider.setTable(getTableNameDB());
-			tabProvider.setChunkSize(getChunkSize());
+			tabProvider.setMetaTab(metaTab); 
+			tabProvider.setChunkSize(getChunkSize());			
 			table.setPKIndexes(getIndexesPK());
 			table.invariant();
-			//tabProvider.invariant(); // It is not possible because still lacks connectionProvider
 		}
 		catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
@@ -211,51 +200,14 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 		}
 	}
 
-	private String[] getFields() throws XavaException {
-		Collection c = new ArrayList();
-		// First the key
-		Iterator itKeyNames = getKeyNames().iterator();
-		while (itKeyNames.hasNext()) {
-			c.add(getMapping().getQualifiedColumn((String) itKeyNames.next()));
-		}
-				
-		// Then the others
-		c.addAll(metaTab.getTableColumns());
-		c.addAll(metaTab.getHiddenTableColumns());
-				
-		String[] result = new String[c.size()];
-		c.toArray(result);		
-		return result;
-	}
-	
-
-	private String[] getConditions() throws RemoteException {
-		try {
-			Collection metaConsults = metaTab.getMetaConsults();
-			String[] conditions = new String[metaConsults.size()];
-			Iterator it = metaConsults.iterator();
-			int i = 0;
-			while (it.hasNext()) {
-				MetaConsult consult = (MetaConsult) it.next();
-				conditions[i++] = insertKeyFields(consult.getConditionSQL());
-			}
-			return conditions;
-		}
-		catch (Exception ex) {
-			log.error(ex.getMessage(), ex);
-			throw new RemoteException(
-					XavaResources.getString("tab_conditions_error", this.modelName));
-		}
-	}
-	
-	private String insertKeyFields(String select) throws XavaException {				
+	private String insertKeyFields(String select) {				
 		String s = select.trim(); 
 		String sUpperCase = s.toUpperCase(); 
 		if (!(sUpperCase.startsWith("SELECT ") || (sUpperCase.startsWith("SELECT\t")))) return select;				
 		StringBuffer result = new StringBuffer("SELECT ");		
 		Iterator itKeyNames = getKeyNames().iterator();
 		while (itKeyNames.hasNext()) {
-			result.append(getMapping().getQualifiedColumn((String) itKeyNames.next()));
+			result.append(tabProvider.toQueryField((String) itKeyNames.next())); 
 			result.append(", ");
 		}
 		result.append(s.substring(7));						
@@ -287,8 +239,6 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 				keyIndexes = getKeyIndexes();
 				propertiesNames = getPropertiesNames();
 			}		
-			Collection tabConverters = getTabConverters();
-			if (tabConverters.isEmpty()) tabConverters = null;
 		}
 		catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
@@ -296,11 +246,13 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 		}
 		DataChunk tv = null; 		
 		try {
-			tv = getDataProvider(getComponentName()).nextChunk(tabProvider, modelName, propertiesNames, tabCalculators, keyIndexes, tabConverters);
+			tv = getDataProvider(getComponentName()).nextChunk(tabProvider, modelName, 
+					propertiesNames, tabCalculators, keyIndexes /*, tabConverters*/);
 		}
 		catch (Exception ex) {
 			cancelDataProvider(getComponentName());
-			tv = getDataProvider(getComponentName()).nextChunk(tabProvider, modelName, propertiesNames, tabCalculators, keyIndexes, tabConverters);						getDataProvider(getComponentName()).nextChunk(tabProvider, modelName, propertiesNames, tabCalculators, keyIndexes, tabConverters);
+			tv = getDataProvider(getComponentName()).nextChunk(tabProvider, modelName, 
+					propertiesNames, tabCalculators, keyIndexes /*, tabConverters*/);									
 		}
 		tabProvider.setCurrent(tv.getIndexNext());				
 		List data = tv.getData();
@@ -343,16 +295,14 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 	private Object[] doValidValuesConversions(Object[] row) throws XavaException {
 		int size = getPropertiesNames().size();
 		for (int i = indexesPK.length; i < size; i++) {			
-			String name = (String) getPropertiesNames().get(i);
+			String name = getPropertiesNames().get(i);
 			MetaProperty metaProperty = getMetaModel().getMetaProperty(name);			
 			if (metaProperty.hasValidValues()) {
-				if (row[i] instanceof Number) {
+				if (row[i] instanceof Number) {					
 					Number value = (Number) row[i];
 					int validValue = value.intValue();
-					row[i] = metaProperty.getValidValue(validValue);					
-				}
-				else {
-					row[i] = null;
+					row[i] = metaProperty.getValidValue(validValue);
+				
 				}
 			}
 		}
@@ -382,59 +332,11 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 		return tabCalculators;
 	}
 	
-	/**
-	 * @return Of TabConverter
-	 */
-	private Collection getTabConverters() throws XavaException {
-		if (tabConverters == null) {
-			tabConverters = new ArrayList();			
-			Iterator it = getPropertiesNames().iterator();
-			int i=0;
-			String table = getMapping().getTableToQualifyColumn(); 
-			while (it.hasNext()) {
-				String propertyName = (String) it.next();
-				try {
-					MetaProperty property = getMetaModel().getMetaProperty(propertyName);
-					PropertyMapping propertyMapping = property.getMapping();
-					if (propertyMapping != null) {
-						IConverter converter = propertyMapping.getConverter();
-						if (converter != null) {
-							tabConverters.add(new TabConverter(propertyName, i,  converter));
-						}
-						else {							
-							IMultipleConverter multipleConverter =  propertyMapping.getMultipleConverter();
-							if (multipleConverter != null) {							
-								tabConverters.add(new TabConverter(propertyName, i, multipleConverter, propertyMapping.getCmpFields(), getFields(), table));
-							}
-							else {
-								// This is the case of a key without converter of type int or long
-								// It's for suporting int and long as key and NUMERIC in database
-								// without to declare an explicit converter
-								if (property.isKey()) {
-									if (property.getType().equals(int.class) || property.getType().equals(Integer.class)) {
-										tabConverters.add(new TabConverter(propertyName, i,  IntegerNumberConverter.getInstance()));
-									}
-									else if (property.getType().equals(long.class) || property.getType().equals(Long.class)) {
-										tabConverters.add(new TabConverter(propertyName, i,  LongNumberConverter.getInstance()));
-									}
-								}
-							}	
-						}
-					}
-				}
-				catch (ElementNotFoundException ex) {
-					// Thus we exclude the property out of mapping
-				}
-				i++;
-			}
-		}
-		return tabConverters;
-	}
-	
 	private int getPropertyIndex(String propertyName)
 		throws XavaException {
 		return getPropertiesNames().indexOf(propertyName);
 	}
+	
 
 	/**
 	 * @return Of <tt>MetaProperty</tt>.
@@ -446,15 +348,10 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 	/**
 	 * @return Of <tt>String</tt>.
 	 */
-	private List getPropertiesNames() throws XavaException {
-		if (propertiesNames == null) {
-			propertiesNames = new ArrayList();
-			propertiesNames.addAll(getKeyNames());
-			propertiesNames.addAll(metaTab.getPropertiesNames());
-			propertiesNames.addAll(metaTab.getHiddenPropertiesNames());
-		}
-		return propertiesNames;
+	private List<String> getPropertiesNames() throws XavaException {
+		return metaTab.getPropertiesNamesWithKeyAndHidden();
 	}
+	
 	
 	private Collection getKeyNames() throws XavaException {		
 		return getMetaModel().getAllKeyPropertiesNames();
@@ -467,14 +364,13 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 		return metaModel;
 	}
 
-	private Map getKeyIndexes()
-		throws FinderException, XavaException, RemoteException {
+	private Map getKeyIndexes() {
 		if (keyIndexes == null) {	
-			Iterator it = getPropertiesNames().iterator();
+			Iterator<String> it = getPropertiesNames().iterator();
 			keyIndexes = new HashMap();
 			int i = 0;
 			while (it.hasNext()) {
-				String propertyName = (String) it.next();
+				String propertyName = it.next();
 				if (getMetaModel().isKey(propertyName)) {					
 					keyIndexes.put(propertyName, new Integer(i));
 				}
@@ -501,14 +397,10 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 
 	public void setComponentName(String string) {
 		componentName = string;
-		metaModel = null;
-		keyIndexes = null;
-		selectBase = null;
 	}
 
 	public void setTabName(String string) {
 		tabName = string;
-		selectBase = null;
 	}
 	
 	
@@ -561,9 +453,8 @@ public class EntityTab implements IEntityTabImpl, java.io.Serializable {
 		return getDataProvider(getComponentName()).getResultSize(tabProvider);
 	}
 	
-	public Number getSum(String property) throws RemoteException { 
-		String column = getMapping().getQualifiedColumn(property);		
-		return getDataProvider(getComponentName()).getSum(tabProvider, column);
+	public Number getSum(String property) throws RemoteException {
+		return getDataProvider(getComponentName()).getSum(tabProvider, property);  		
 	}
 
 	public void reset() throws RemoteException {
