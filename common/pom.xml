@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openxava</groupId>
 		<artifactId>openxava-project</artifactId>
-		<version>4.4.1.MVN-SNAPSHOT</version>
+		<version>4.5.MVN-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>openxava-common</artifactId>
