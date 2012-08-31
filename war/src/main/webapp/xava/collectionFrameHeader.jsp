@@ -30,7 +30,7 @@ if (!collectionView.isCollectionCalculated()) {
 		tab.setTabObject(tabObject);		
 		tab.setRequest(request);  
 		tab.reset();
-		request.setAttribute(Tab.TAB_RESETED_PREFIX + tab, true);
+		request.setAttribute(Tab.TAB_RESETED_PREFIX + tab, Boolean.TRUE);
 	}
 }
 %>

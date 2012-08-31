@@ -4,12 +4,12 @@
 
 	<groupId>org.openxava</groupId>
 	<artifactId>openxava-project</artifactId>
-	<version>4.4.1.MVN-SNAPSHOT</version>
+	<version>4.5.MVN-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
 	<properties>
-		<openxava.version>4.4.1</openxava.version>
+		<openxava.version>4.5</openxava.version>
 		<liferay.version>6.1.0</liferay.version>
 		<hibernate.version>3.6.1.Final</hibernate.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,7 +20,7 @@
 			<dependency>
 				<groupId>org.openxava</groupId>
 				<artifactId>openxava</artifactId>
-				<version>4.4.1.MVN-SNAPSHOT</version>
+				<version>4.5.MVN-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

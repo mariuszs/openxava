@@ -73,7 +73,7 @@ int totalSize = -1;
 if (request.getAttribute(org.openxava.tab.Tab.TAB_RESETED_PREFIX + tab) == null) {
 	tab.setRequest(request);
 	tab.reset();
-	request.setAttribute(org.openxava.tab.Tab.TAB_RESETED_PREFIX + tab, true); 
+	request.setAttribute(org.openxava.tab.Tab.TAB_RESETED_PREFIX + tab, Boolean.TRUE); 
 }
 boolean resizeColumns = style.allowsResizeColumns() && tab.isResizeColumns();
 String browser = request.getHeader("user-agent");

@@ -1,6 +1,7 @@
 package org.openxava.util;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -376,20 +377,15 @@ public class Dates {
 		return df;
 	}
 	
-	public static String dateFormatForJSCalendar(Locale locale) {		
-		DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, locale);
-		String date = df.format(create(1, 2, 1971)); // d, m, y
-		boolean always4InYear= "es".equals(locale.getLanguage()) || "pl".equals(locale.getLanguage());
-		String result = date.
-			replaceAll("01", "%d").
-			replaceAll("02", "%m").
-			replaceAll("1971", "%Y").
-			replaceAll("71", always4InYear?"%Y":"%y"). 			
-			replaceAll("1", "%d").
-			replaceAll("2", "%m");
+public static String dateFormatForJSCalendar(Locale locale) {
+
+		DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
+		SimpleDateFormat sf = (SimpleDateFormat) df;
+		String result = sf.toLocalizedPattern().replaceAll("dd", "%d")
+				.replaceAll("MM", "%m").replaceAll("yyyy", "%Y");
+		
 		return result;
-	}	
-	
+	}
 	public static String dateTimeFormatForJSCalendar(Locale locale) {		
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
 		String datetime = df.format(create(1, 2, 1971, 15, 59, 0)); // d, m, y, hr, min, sec 
