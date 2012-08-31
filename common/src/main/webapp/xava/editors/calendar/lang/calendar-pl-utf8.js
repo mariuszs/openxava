@@ -1,6 +1,8 @@
 ﻿// ** I18N
 // Calendar PL language
 // Author: Artur Filipiak, <imagen@poczta.fm>
+// Author: Dariusz Pietrzak, <eyck@ghost.anime.pl>
+// Author: Janusz Piwowarski, <jpiw@go2.pl>
 // January, 2004
 // Encoding: UTF-8
 Calendar._DN = new Array
@@ -55,11 +57,11 @@ Calendar._TT["WEEKEND"] = "0,6";
 
 Calendar._TT["CLOSE"] = "Zamknij";
 Calendar._TT["TODAY"] = "Dziś";
-Calendar._TT["TIME_PART"] = "(Shift-)klik | drag, aby zmienić wartość";
+Calendar._TT["TIME_PART"] = "(Shift-)Kliknij lub przeciągnij by zmienić wartość";
 
 // date formats
 Calendar._TT["DEF_DATE_FORMAT"] = "%Y-%m-%d";
 Calendar._TT["TT_DATE_FORMAT"] = "%a, %b %e";
 
-Calendar._TT["WK"] = "wk";
+Calendar._TT["WK"] = "ty";
 Calendar._TT["TIME"] = "Czas:";
