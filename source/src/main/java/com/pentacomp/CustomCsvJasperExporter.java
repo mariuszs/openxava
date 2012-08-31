@@ -7,8 +7,7 @@ import net.sf.jasperreports.engine.util.JRStyledText;
 
 /**
  * 
- * Zmiania sposób dodawania znakow " w stosunku do oryginalu. Teraz wszystkie pola String
- * otoczone znakiem ". Znak " w tekście jest zamieniany na ""
+ * Zmiania sposób dodawania
  * 
  */
 public class CustomCsvJasperExporter extends JRCsvExporter {
@@ -51,6 +50,7 @@ public class CustomCsvJasperExporter extends JRCsvExporter {
         return source.replaceAll("\"", "\"\"");
     }
 
+    @Override
     protected String prepareText(String source)
     {
         return source.toString();
