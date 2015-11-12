@@ -1,5 +1,5 @@
 
-OpenXava Mavenized (beta)
+OpenXava Mavenized (beta) *outdated*
 ================================
 
 Using
